@@ -2,64 +2,102 @@
 
 
 
-## 1. Structure du Projet
 
-La structure est conçue pour être claire et sécurisée. Le dossier /public est le seul point d'entrée exposé au web, garantissant que la logique interne et les fichiers de configuration restent privés.
+Ce dépôt contient l'application **CodeIgniter 4 (CI4)** et l'environnement de conteneurisation basé sur **Podman** pour le développement.
 
-    /
-    ├── public/          <- Point d'entrée web (accessible)
-    ├── app/             <- Cœur de l'application (logique métier)
-    ├── .htaccess        <- Règles de réécriture d'URL
-    ├── composer.json    <- Liste des dépendances
-    └── README.md
+L'environnement comprend trois services :
+
+1.  **php** (`web`): PHP 8.4 + Apache (avec Composer, CI4 extensions, etc.).
+2.  **mysql8** (`mysql`): Base de données MySQL 8.0.
+3.  **phpmyadmin**: Interface de gestion pour MySQL.
+
+-----
+
+## 1\. 📂 Structure du Projet
+
+Votre dépôt Git doit être organisé comme suit pour que les scripts de synchronisation fonctionnent correctement. Notez que le nom du dossier d'environnement (ici `contener`) est renommé selon votre souhait.
+
+```
+Votre-Dépôt-Git/
+├── contener/                    
+│   ├── app_php/
+│   ├── scripts/
+│   ├── compose.yaml
+│   └── data/
+│       ├── CI4/                 <-- 🚨 Le répertoire racine de votre application CodeIgniter
+│       │   ├── app/             (Logique métier)
+│       │   ├── public/          (DocumentRoot d'Apache)
+│       │   └── ...
+│       ├── phpinfo.php
+│       └── test_connexion.php
+└── README.md
+```
+
+### 🚨 Important
+
+  * **Toutes les modifications du code CI4** doivent se faire dans le dossier local `data/CI4/`.
+  * Le dossier `data/CI4/` correspond à `/var/www/html/CI4/` à l'intérieur du conteneur.
+
+-----
+
+## 2\. ⚙️ Prérequis et Configuration Initiale (🚨Windows)
+
+1.  **Installation de Podman :** Installez **Podman Desktop** sur Windows (ou Podman CLI sur Linux).
+2.  **Machine Podman :** Démarrez la machine virtuelle Podman (une seule fois par session) :
+    ```bash
+    podman machine start
+    ```
+3.  **Outil Compose :** Assurez-vous que l'outil Compose (`podman compose`) est installé (souvent via Podman Desktop ou `pip` sur Linux).
+
+-----
+
+## 3\. 🛠️ Lancement et Workflow (Windows/Git Bash & Fedora/Linux)
+
+### A. Démarrage de l'Environnement
+
+Placez-vous à la racine du dossier d'environnement (là où se trouve `compose.yaml` et le dossier `scripts/`).
+
+```bash
+cd contener
+
+# Lancer la construction et le démarrage des conteneurs
+./scripts/create.sh
+```
+
+### B. Accès aux Services
+
+| Service | Accès | Description |
+| :--- | :--- | :--- |
+| **CodeIgniter 4** | `http://localhost:8081` | Le Virtual Host CodeIgniter. |
+| **Test de connexion** | `http://localhost:8080/test_connexion.php` | Vérification de la connexion `php` au service `mysql`. |
+| **phpMyAdmin** | `http://localhost:8082` | Gestion de la base de données. |
+
+### C. Workflow de Développement (Synchronisation du Code)
+
+Après avoir modifié vos fichiers **localement**, vous devez les transférer au conteneur.
+
+  * **Transférer le code** vers le conteneur et mettre à jour les permissions :
+    ```bash
+    ./scripts/push.sh
+    ```
+  * **Récupérer le code**  :
+    ```bash
+    ./scripts/pull.sh
+    ```
+
+### D. Accès au Terminal du Conteneur
+
+Le script a été modifié pour fonctionner sous Git Bash (`MSYS_NO_PATHCONV=1`).
+
+```bash
+# Ouvre un terminal dans le conteneur 'php'
+./scripts/terminal.sh
+```
 
 
-## 2. Dossiers Critiques Détaillés
 
-### 2.1. 📁 Le Dossier /public (Point d'Entrée)
+### E. Arrêt de l'Environnement
 
-Le dossier public est le Front Controller de l'application.
-
-Rôle Principal : C'est le seul dossier accessible directement par les utilisateurs via le navigateur. Tous les accès HTTP passent par ce dossier, ce qui garantit que l'application démarre toujours au même endroit.
-
-Sécurité : L'existence de ce dossier assure que les fichiers sensibles (comme la configuration de la base de données, les modèles et les contrôleurs) ne peuvent jamais être lus directement depuis le web.
-
-Contenu Clé :
-
-- index.php : Le fichier d'amorçage initial qui initialise le framework, charge l'autoloader et lance le routage.
-
-- assets/ : Contient toutes les ressources statiques nécessaires à l'affichage :
-
-- css/ : Feuilles de style.
-
-- js/ : Fichiers JavaScript.
-
-- img/ : Images du site et des produits.
-
-### 2.2. 📂 Le Dossier /app (Cœur du MVC)
-
-Le dossier app contient toute la logique de l'application, organisée selon le modèle Modèle-Vue-Contrôleur (MVC).
-
-#### 2.2.1. /app/Controllers/
-
-Les Contrôleurs gèrent la requête de l'utilisateur. Ils reçoivent les données (par exemple, un formulaire soumis), font appel au Modèle pour interagir avec les données, et choisissent quelle Vue afficher en réponse.
-
-Exemples : ProductController.php, CartController.php, OrderController.php.
-
-#### 2.2.2. /app/Models/
-
-Les Modèles représentent la structure des données (les entités de votre e-commerce) et encapsulent la logique d'accès à la base de données.
-
-Exemples : Product.php, User.php, Order.php.
-
-#### 2.2.3. /app/Views/
-
-Les Vues sont responsables de la présentation des données à l'utilisateur. Ce sont généralement des fichiers HTML contenant de petites portions de code PHP pour insérer les données fournies par les Contrôleurs.
-
-
-
-#### 2.2.4. /app/Core/
-
-Contient les classes d'infrastructure et d'utilitaires génériques utilisées par l'ensemble de l'application (ex. : la gestion des routes, la connexion à la base de données).
-
-
+```bash
+./scripts/down.sh
+```

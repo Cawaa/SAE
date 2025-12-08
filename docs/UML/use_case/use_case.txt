@@ -1,0 +1,121 @@
+@startuml
+' 1. On change la direction pour éviter l'effet "tour verticale"
+left to right direction
+
+skinparam packageStyle rectangle
+
+actor Beatmaker
+actor Interprete as "Interprète"
+actor Administrateur
+
+rectangle "Site vente de beats" {
+
+    ' Cas central partagé
+    usecase "Se Connecter / \nCréer un compte" as UC_Login
+
+    ' === GROUPE 1 : ACHAT & INTERPRÈTE ===
+    package "Espace Achat / Interprète" {
+        usecase "Consulter des Beats" as UC_Consulter
+        usecase "Mettre dans le panier" as UC_Panier
+        usecase "Ajouter aux favoris" as UC_Favoris
+        usecase "Commenter" as UC_Commenter
+        
+        usecase "Modifier le panier" as UC_ModifPanier
+        usecase "Valider" as UC_Valider
+        usecase "Payer" as UC_Payer
+    }
+
+    ' === GROUPE 2 : BEATMAKER ===
+    package "Espace Beatmaker" {
+        usecase "Accéder au tableau de\nbord beatmaker" as UC_DashBeat
+        usecase "MAJ des données\ndu compte" as UC_MAJ_Beat
+        usecase "Statistiques" as UC_Stats
+        usecase "Gérer annonce" as UC_Annonce
+        usecase "Valider mise en ligne\nproduit / modification" as UC_ValidMiseEnLigne
+    }
+
+    ' === GROUPE 3 : ADMIN ===
+    package "Espace Administration" {
+        usecase "Accéder au tableau de\nbord admin" as UC_DashAdmin
+        usecase "Modération" as UC_Moderation
+        
+        ' Gestion Interprète vue par Admin
+        usecase "Accéder au tableau de\nbord interprète" as UC_DashInterprete
+        usecase "MAJ des données\ndu compte (Interprète)" as UC_MAJ_Interprete
+        usecase "Gestion des commandes" as UC_GestCommandes
+        usecase "Consulter favoris" as UC_ConsultFavoris
+    }
+
+    ' --- RELATIONS ACTEURS ---
+    Interprete -- UC_Login
+    Beatmaker -- UC_Login
+    Administrateur -- UC_Login
+    
+    Interprete -- UC_Consulter
+    Interprete -- UC_Panier
+    
+    Beatmaker -- UC_DashBeat
+    
+    Administrateur -- UC_DashAdmin
+    Administrateur -- UC_DashInterprete
+
+    ' --- RELATIONS INTERNES (INCLUDES/EXTENDS) ---
+    
+    ' Connexion requise
+    UC_Login ..> UC_Consulter : <<include>>
+    UC_Login ..> UC_Panier : <<include>>
+    UC_Login ..> UC_DashBeat : <<include>>
+    UC_Login ..> UC_DashAdmin : <<include>>
+    UC_Login ..> UC_DashInterprete : <<include>>
+
+    ' Espace Achat
+    UC_Consulter <.. UC_Favoris : <<extend>>
+    UC_Consulter <.. UC_Commenter : <<extend>>
+    UC_Panier <.. UC_ModifPanier : <<extend>>
+    UC_Panier <.. UC_Valider : <<extend>>
+    UC_Valider <.. UC_Payer : <<extend>>
+
+    ' Espace Beatmaker
+    UC_DashBeat <.. UC_MAJ_Beat : <<extend>>
+    UC_DashBeat <.. UC_Stats : <<extend>>
+    UC_DashBeat <.. UC_Annonce : <<extend>>
+    UC_Annonce ..> UC_ValidMiseEnLigne : <<include>> 
+    ' Note: J ai ajusté le sens logique ici, ou vous pouvez mettre un lien admin vers cette validation
+
+    ' Espace Admin
+    UC_DashAdmin <.. UC_Moderation : <<extend>>
+    UC_DashAdmin <.. UC_ValidMiseEnLigne : <<extend>>
+    
+    UC_DashInterprete <.. UC_MAJ_Interprete : <<extend>>
+    UC_DashInterprete <.. UC_GestCommandes : <<extend>>
+    UC_DashInterprete <.. UC_ConsultFavoris : <<extend>>
+
+    ' --- NOTES ---
+    note right of UC_MAJ_Beat
+      Adresse, Nom, Prénom,
+      Coordonnées bancaires 
+    end note
+
+    note right of UC_Stats
+      Ventes, Vues,
+      Annonces, Mises au panier
+    end note
+
+    note right of UC_Annonce
+      Consulter, Ajouter,
+      Modifier, Supprimer
+    end note
+
+    note right of UC_Moderation
+      Supression compte inactif,
+      Contenus (Blogs, Vidéos...),
+      Commission
+    end note
+    
+    note right of UC_GestCommandes
+      Historique, Factures,
+      Suivi commande
+    end note
+
+}
+@enduml

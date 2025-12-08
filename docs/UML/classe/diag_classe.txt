@@ -1,0 +1,159 @@
+@startuml
+' ============================
+' Classes principales
+' ============================
+
+class Utilisateur {
+  +id: UUID
+  +email: String
+  +motDePasseHash: String
+  +pseudo: String
+  +dateInscription: DateTime
+  +statut: StatutUtilisateur
+}
+
+enum StatutUtilisateur {
+  ACTIF
+  SUSPENDU
+  BLOQUE
+}
+
+class Role {
+  +code: String      ' BEATMAKER, INTERPRETE, ADMIN...
+  +nom: String
+}
+
+' Relation N-N Utilisateur <-> Role
+Utilisateur "0..*" -- "0..*" Role : roles
+
+' Lien explicite vers l'énumération de statut
+Utilisateur "0..*" -- "1" StatutUtilisateur : statut
+
+' ============================
+' Beats (produits)
+' ============================
+
+class Beat {
+  +id: UUID
+  +titre: String
+  +description: String
+  +fichierAudioUrl: String
+  +bpm: int
+  +prix: Decimal
+  +etat: EtatBeat
+  +datePublication: DateTime
+}
+
+enum EtatBeat {
+  BROUILLON
+  EN_LIGNE
+  VENDU
+  RETIRE
+}
+
+' Lien explicite vers l'énumération d'état du beat
+Beat "0..*" -- "1" EtatBeat : etat
+
+' Un utilisateur (rôle Beatmaker) peut créer plusieurs beats
+Utilisateur "1" -- "0..*" Beat : beatmaker
+
+' ============================
+' Panier & favoris (côté interprète)
+' ============================
+
+class Panier {
+  +id: UUID
+  +dateCreation: DateTime
+}
+
+class LignePanier {
+  +id: UUID
+  +quantite: int
+  +prixUnitaire: Decimal
+}
+
+Panier "1" -- "0..*" LignePanier
+LignePanier "1" -- "1" Beat
+
+' Un utilisateur (rôle Interprète) a au plus un panier actif
+Utilisateur "1" -- "0..1" Panier : panierActif
+
+class Favori {
+  +dateAjout: DateTime
+}
+
+Utilisateur "1" -- "0..*" Favori
+Beat "1" -- "0..*" Favori
+
+' ============================
+' Commandes (achats)
+' ============================
+
+class Commande {
+  +id: UUID
+  +dateCreation: DateTime
+  +montantTotal: Decimal
+  +statut: StatutCommande
+}
+
+enum StatutCommande {
+  EN_ATTENTE_PAIEMENT
+  PAYEE
+  ANNULEE
+}
+
+' Lien explicite vers l'énumération de statut de commande
+Commande "0..*" -- "1" StatutCommande : statut
+
+class LigneCommande {
+  +id: UUID
+  +prixUnitaire: Decimal
+}
+
+Commande "1" -- "1..*" LigneCommande
+LigneCommande "1" -- "1" Beat
+
+' Lien avec Utilisateur
+Utilisateur "1" -- "0..*" Commande : acheteur
+Utilisateur "1" -- "0..*" Commande : vendeur
+
+' ============================
+' Commentaires
+' ============================
+
+class Commentaire {
+  +id: UUID
+  +texte: String
+  +note: int
+  +dateCreation: DateTime
+}
+
+Utilisateur "1" -- "0..*" Commentaire
+Beat "1" -- "0..*" Commentaire
+
+' ============================
+' Notes métier
+' ============================
+
+note right of Beat
+  Un Beat est exclusif :
+  - vendu une seule fois
+  - quand une LigneCommande associée
+    est dans une Commande PAYEE,
+    l'état passe à VENDU
+end note
+
+note bottom of Commande
+  Dans une Commande :
+  - acheteur = Utilisateur (rôle Interprète)
+  - vendeur = Utilisateur (rôle Beatmaker)
+end note
+
+note right of Role
+  Exemples de code :
+  - BEATMAKER
+  - INTERPRETE
+  - ADMIN
+end note
+
+@enduml

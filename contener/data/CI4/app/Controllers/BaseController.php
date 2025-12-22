@@ -35,7 +35,7 @@ abstract class BaseController extends Controller
      *
      * @var list<string>
      */
-    protected $helpers = ['url', 'form', 'session'];
+    protected $helpers = [];
 
     /**
      * Be sure to declare properties for any property fetch you initialized.
@@ -50,7 +50,6 @@ abstract class BaseController extends Controller
     {
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
-        
 
         // Preload any models, libraries, etc, here.
 

@@ -24,13 +24,12 @@ class Database extends Config
      *
      * @var array<string, mixed>
      */
-    
     public array $default = [
         'DSN'          => '',
-        'hostname'     => 'mysql', // Nom du service dans compose.yaml
-        'username'     => 'user',  // Défini dans compose.yaml
-        'password'     => 'pass',  // Défini dans compose.yaml
-        'database'     => 'tp',    // Défini dans compose.yaml
+        'hostname'     => 'localhost',
+        'username'     => '',
+        'password'     => '',
+        'database'     => '',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,

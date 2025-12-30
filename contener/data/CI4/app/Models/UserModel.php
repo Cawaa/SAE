@@ -1,19 +1,19 @@
 <?php
+
 namespace App\Models;
-use CodeIgniter\Model;
 
-class UserModel extends Model {
-    protected $table      = 'users';
-    protected $primaryKey = 'id';
-    protected $allowedFields = ['username', 'email', 'password'];
-    
-    // Hashage automatique du mot de passe avant insertion
-    protected $beforeInsert = ['hashPassword'];
+use CodeIgniter\Shield\Models\UserModel as ShieldUserModel;
 
-    protected function hashPassword(array $data) {
-        if (isset($data['data']['password'])) {
-            $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
-        }
-        return $data;
+class UserModel extends ShieldUserModel
+{
+    protected function initialize(): void
+    {
+        parent::initialize();
+
+        // Ajoutez ici vos champs personnalisés si vous en avez (ex: 'username')
+        // Shield gère déjà 'email' et 'password'
+        $this->allowedFields = array_merge($this->allowedFields, [
+            'username', 
+        ]);
     }
 }

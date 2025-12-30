@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
-    <h1>Découvrez des sons de créateurs</h1>
+    <h1>Découvrez des sons de créateurs 1   </h1>
     <p>Achetez les productions de créateurs indépendants pour soutenir leur talent et leur savoir-faire.</p>
 
     

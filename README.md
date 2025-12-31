@@ -1,7 +1,11 @@
 # eq_1_04_BRACQ-Noe_DEVILLERS-Tino_DUFRESNE-Elric_MARTIN-Sacha
 
-
-
+## Pour lancer le projet :
+1. Lancer le script create.sh
+2. Lancer le script push.sh
+3. Lancer le script terminal.sh
+4. Une fois dans le terminal aller dans le dossier `CI4`
+5. Taper la commande `composer install`
 
 Ce dépôt contient l'application **CodeIgniter 4 (CI4)** et l'environnement de conteneurisation basé sur **Podman** pour le développement.
 
@@ -13,25 +17,8 @@ L'environnement comprend trois services :
 
 -----
 
-## 1\. 📂 Structure du Projet
 
-Votre dépôt Git doit être organisé comme suit pour que les scripts de synchronisation fonctionnent correctement. Notez que le nom du dossier d'environnement (ici `contener`) est renommé selon votre souhait.
 
-```
-Votre-Dépôt-Git/
-├── contener/                    
-│   ├── app_php/
-│   ├── scripts/
-│   ├── compose.yaml
-│   └── data/
-│       ├── CI4/                 <-- 🚨 Le répertoire racine de votre application CodeIgniter
-│       │   ├── app/             (Logique métier)
-│       │   ├── public/          (DocumentRoot d'Apache)
-│       │   └── ...
-│       ├── phpinfo.php
-│       └── test_connexion.php
-└── README.md
-```
 
 ### 🚨 Important
 

@@ -1,4 +1,7 @@
-# eq_1_04_BRACQ-Noe_DEVILLERS-Tino_DUFRESNE-Elric_MARTIN-Sacha
+# Avant de push 
+## Toujours vérifier que le dossier vendor n'est pas listé dans les fichiers commited dans la commande git status
+
+Si c'est le cas faire `git rm -r --cached data/vendor`
 
 ## Pour lancer le projet :
 1. Si ce n'est pas fait copier coller le fichier `env` et le renommer `.env` dans data/CI4 et décommentez les lignes comme suivant (si cela n'est pas fait) : 

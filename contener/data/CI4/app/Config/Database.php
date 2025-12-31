@@ -26,10 +26,10 @@ class Database extends Config
      */
     public array $default = [
     'DSN'          => '',
-    'hostname'     => 'localhost',
-    'username'     => 'votre_utilisateur', // Par défaut 'root' sur XAMPP
-    'password'     => 'votre_mot_de_passe', // Souvent vide '' sur XAMPP
-    'database'     => 'nom_de_votre_bdd',  // Le nom de la base que vous avez créée
+    'hostname'     => 'mysql', // Nom du service dans compose.yaml
+    'username'     => 'user',
+    'password'     => 'pass',
+    'database'     => 'tp',
     'DBDriver'     => 'MySQLi',
     'DBPrefix'     => '',
     'pConnect'     => false,

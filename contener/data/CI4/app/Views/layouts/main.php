@@ -60,7 +60,7 @@
     <nav>
         <div class="nav-left">
             <a href="<?= base_url('/') ?>">Accueil</a>
-            <a href="<?= base_url('/artiste') ?>">Accueil</a>
+            <a href="<?= base_url('/artistes') ?>">Artistes</a>
             <a href="<?= base_url('/boutique') ?>">Boutique</a>
         </div>
         <div class="nav-center">TEMPO</div>

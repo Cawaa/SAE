@@ -1,11 +1,27 @@
 # eq_1_04_BRACQ-Noe_DEVILLERS-Tino_DUFRESNE-Elric_MARTIN-Sacha
 
 ## Pour lancer le projet :
-1. Lancer le script create.sh
-2. Lancer le script push.sh
-3. Lancer le script terminal.sh
-4. Une fois dans le terminal aller dans le dossier `CI4`
-5. Taper la commande `composer install`
+1. Si ce n'est pas fait copier coller le fichier `env` et le renommer `.env` dans data/CI4 et décommentez les lignes comme suivant (si cela n'est pas fait) : 
+
+```
+#--------------------------------------------------------------------
+# DATABASE
+#--------------------------------------------------------------------
+
+database.default.hostname = mysql
+database.default.database = tp
+database.default.username = user
+database.default.password = pass
+database.default.DBDriver = MySQLi
+database.default.DBPrefix =
+database.default.port = 3306
+```
+2. Lancer le script create.sh
+3. Lancer le script push.sh
+4. Lancer le script terminal.sh
+5. Une fois dans le terminal aller dans le dossier `CI4`
+6. Taper la commande `composer install`
+7. Taper la commande `php spark migrate --all`
 
 Ce dépôt contient l'application **CodeIgniter 4 (CI4)** et l'environnement de conteneurisation basé sur **Podman** pour le développement.
 

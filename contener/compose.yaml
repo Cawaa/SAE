@@ -2,8 +2,10 @@ services:
   web:
     container_name: php
     build:
-      context: app_php
+      context: ./data/app_php
       target: builder
+    environment:
+      - CI_ENVIRONMENT=development
     ports:
       - '8080:80'
       - '8081:81'

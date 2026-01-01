@@ -4,78 +4,52 @@
     <meta charset="UTF-8">
     <title>TEMPO - <?= $title ?? 'Accueil' ?></title>
     <style>
-    body { 
-        font-family: sans-serif; 
-        margin: 0; 
-        padding: 0;
-        
-        /* --- DÉBUT DE LA CONFIGURATION IMAGE DE FOND --- */
-        /* Charge l'image depuis le dossier public/images/ */
-        background-image: url('<?= base_url("images/image_accueil.jpg") ?>');
-        
-        /* L'image prend toute la largeur et la hauteur de l'écran */
-        background-size: cover; 
-        
-        /* L'image est centrée */
-        background-position: center center;
-        
-        /* L'image reste fixe (ne bouge pas) quand on scrolle */
-        background-attachment: fixed;
-        
-        /* Assure que le fond ne se répète pas */
-        background-repeat: no-repeat;
-        
-        /* Assure que le fond prend au moins la hauteur de l'écran */
-        min-height: 100vh;
-        /* --- FIN DE LA CONFIGURATION --- */
-    }
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            /* Image de fond fixe qui reste en place pendant le scroll */
+            background-image: url('<?= base_url("images/image_accueil.jpg") ?>');
+            background-size: cover; 
+            background-position: center center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
 
-    nav { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        padding: 15px 30px; 
-        background: rgba(51, 51, 51, 0.9); /* Légère transparence sur le menu pour le style */
-        color: white; 
-    }
-    .nav-left { flex: 1; }
-    .nav-center { flex: 1; text-align: center; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; }
-    .nav-right { flex: 1; text-align: right; }
-    nav a { color: white; text-decoration: none; margin-left: 15px; }
-    
-    .container { 
-        padding: 40px; 
-        max-width: 1000px; 
-        margin: 50px auto; 
-        
-        /* Ajout d'un fond blanc semi-transparent pour lire le texte par-dessus l'image */
-        background-color: rgba(255, 255, 255, 0.85); 
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.3);
-    }
-    .error { color: red; }
-</style>
+        /* Navigation fixe en haut pour rester visible */
+        nav { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 50px; 
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-left a, .nav-right a { color: #333; text-decoration: none; margin: 0 15px; font-weight: 500; }
+        .nav-center { font-size: 1.8rem; font-weight: 900; letter-spacing: 3px; }
+
+        .main-content { width: 100%; }
+    </style>
 </head>
 <body>
     <nav>
         <div class="nav-left">
-            <a href="<?= base_url('/') ?>">Accueil</a>
+            <a href="<?= base_url('/') ?>">Home</a>
             <a href="<?= base_url('/artistes') ?>">Artistes</a>
             <a href="<?= base_url('/boutique') ?>">Boutique</a>
         </div>
         <div class="nav-center">TEMPO</div>
         <div class="nav-right">
-            <?php if(session()->get('isLoggedIn')): ?>
-                <span>Bonjour, <?= session()->get('username') ?></span>
-                <a href="<?= base_url('logout') ?>">Déconnexion</a>
-            <?php else: ?>
-                <a href="<?= base_url('login') ?>">Connexion</a>
-                <a href="<?= base_url('register') ?>">S'inscrire</a>
-            <?php endif; ?>
+            <a href="<?= base_url('login') ?>">Connexion</a>
+            
         </div>
     </nav>
 
-    <div class="container">
+    <div class="main-content">
         <?= $this->renderSection('content') ?>
     </div>
 </body>

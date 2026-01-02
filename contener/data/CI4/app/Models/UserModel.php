@@ -2,18 +2,33 @@
 
 namespace App\Models;
 
-use CodeIgniter\Shield\Models\UserModel as ShieldUserModel;
+use CodeIgniter\Model;
 
-class UserModel extends ShieldUserModel
+class UserModel extends Model
 {
-    protected function initialize(): void
-    {
-        parent::initialize();
+    protected $table      = 'users';
+    protected $primaryKey = 'id';
+    protected $returnType = 'array';
 
-        // Ajoutez ici vos champs personnalisés si vous en avez (ex: 'username')
-        // Shield gère déjà 'email' et 'password'
-        $this->allowedFields = array_merge($this->allowedFields, [
-            'username', 
-        ]);
+    protected $allowedFields = [
+        'email',
+        'username',
+        'password_hash',
+        'role',
+        'avatar',         
+        'artist_genre',  
+        'created_at',
+    ];
+
+    protected $useTimestamps = false;
+
+    public function findByEmail(string $email): ?array
+    {
+        return $this->where('email', strtolower(trim($email)))->first();
+    }
+
+    public function findByUsername(string $username): ?array
+    {
+        return $this->where('username', trim($username))->first();
     }
 }

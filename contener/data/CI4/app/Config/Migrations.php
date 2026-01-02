@@ -47,4 +47,16 @@ class Migrations extends BaseConfig
      * - Y_m_d_His_
      */
     public string $timestampFormat = 'Y-m-d-His_';
+
+    /**
+     * désactive les migrations vendor comme shield
+     */
+    public bool $discoverInComposer = false;
+
+     /**
+     * On autorise UNIQUEMENT les migrations de App\
+     */
+    public array $namespaces = [
+        'App',
+    ];
 }

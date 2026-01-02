@@ -24,8 +24,9 @@ database.default.port = 3306
 4. Lancer le script terminal.sh
 5. Une fois dans le terminal aller dans le dossier `CI4`
 6. Taper la commande `composer install`
-7. Taper la commande `composer require codeigniter4/shield`
-8. Taper la commande `php spark migrate --all`
+(on utilise pas shield mais un auth maison)
+7. Taper la commande `php spark migrate`
+8. Taper la commande `php spark db:seed DatabaseSeeder`
 
 Ce dépôt contient l'application **CodeIgniter 4 (CI4)** et l'environnement de conteneurisation basé sur **Podman** pour le développement.
 
@@ -36,8 +37,6 @@ L'environnement comprend trois services :
 3.  **phpmyadmin**: Interface de gestion pour MySQL.
 
 -----
-
-
 
 
 ### 🚨 Important

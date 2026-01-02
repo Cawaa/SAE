@@ -70,3 +70,4 @@ class BeatsSeeder extends Seeder
         $this->db->table('beats')->insertBatch($beats);
     }
 }
+

@@ -1,0 +1,101 @@
+h1, h2 {
+    color: var(--primary-blue); /* Utilise le bleu du thème global */
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.artist-section {
+    margin-bottom: 50px;
+    padding: 25px;
+    background: #fcfcfc;
+    border-radius: 20px;
+    border: 1px solid #f0f0f0;
+}
+
+/* Conteneur de défilement horizontal */
+.artist-row {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    padding: 15px 5px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-blue) #f0f0f0;
+}
+
+/* Cartes Artistes */
+.artist-card {
+    flex: 0 0 280px;
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eef2f7;
+    transition: all 0.3s ease;
+}
+
+.artist-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+    border-color: var(--primary-blue);
+}
+
+.artist-avatar img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-blue);
+    margin-bottom: 15px;
+    padding: 3px;
+}
+
+.artist-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.artist-genre {
+    color: #64748b;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin: 5px 0 15px 0;
+}
+
+.artist-stats {
+    background: #eef2f7;
+    color: #1e40af;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Liste des beats */
+.beat-chips {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.beat-chip {
+    background: #f8fafc;
+    color: var(--primary-blue);
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.beat-chip:hover {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}

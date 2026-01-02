@@ -1,24 +1,37 @@
+
 <?= $this->extend('layouts/main') ?>
+
+<?= $this->section('extra-css') ?>
+    <link rel="stylesheet" href="<?= base_url('css/auth.css') ?>">
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 
-<h1>Connexion</h1>
+<div class="auth-card">
+    <h1>Bon retour !</h1>
+    <p class="subtitle">Connectez-vous pour accéder à vos beats</p>
 
-<?php if (!empty($error)) : ?>
-    <p><?= esc($error) ?></p>
-<?php endif; ?>
+    <?php if (!empty($error)) : ?>
+        <p style="color: #ef4444; text-align: center; font-size: 0.8rem;"><?= esc($error) ?></p>
+    <?php endif; ?>
 
-<form method="post" action="<?= base_url('/login') ?>">
-    <?= csrf_field() ?>
+    <form method="post" action="<?= base_url('/login') ?>">
+        <?= csrf_field() ?>
 
-    <label>Email</label><br>
-    <input type="email" name="email" required><br><br>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="votre@email.com" required>
+        </div>
 
-    <label>Mot de passe</label><br>
-    <input type="password" name="password" required><br><br>
+        <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" name="password" placeholder="••••••••" required>
+        </div>
 
-    <button type="submit">Se connecter</button>
-</form>
+        <button type="submit" class="btn-beatflow">Se connecter</button>
+    </form>
 
-<p><a href="<?= base_url('/register') ?>">Créer un compte</a></p>
+    <p class="footer-text">Nouveau sur Tempo ? <a href="<?= base_url('/register') ?>">Créer un compte</a></p>
+</div>
 
 <?= $this->endSection() ?>

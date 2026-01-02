@@ -1,30 +1,67 @@
 <?= $this->extend('layouts/main') ?>
+
+<?= $this->section('extra-css') ?>
+    <link rel="stylesheet" href="<?= base_url('css/auth.css') ?>">
+<?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 
-<h1>Inscription</h1>
 
-<?php if (!empty($error)) : ?>
-    <p><?= esc($error) ?></p>
-<?php endif; ?>
+<div class="auth-card">
+    <h1>Créer un compte</h1>
+    <p class="subtitle">Rejoignez la communauté Tempo</p>
 
-<form method="post" action="<?= base_url('/register') ?>">
-    <?= csrf_field() ?>
+    <?php if (!empty($error)) : ?>
+        <p style="color: #ef4444; text-align: center; font-size: 0.8rem;"><?= esc($error) ?></p>
+    <?php endif; ?>
 
-    <label>Pseudo</label><br>
-    <input type="text" name="username" required><br><br>
+    <form method="post" action="<?= base_url('/register') ?>">
+        <?= csrf_field() ?>
 
-    <label>Email</label><br>
-    <input type="email" name="email" required><br><br>
+        <label style="display:block; margin-bottom:8px; font-size:0.9rem;">Je suis un :</label>
+        <div class="role-selector">
+            <label class="role-option active" id="label-client">
+                <input type="radio" name="role" value="client" checked onclick="selectRole('client')">
+                <strong>Client</strong>
+            </label>
+            <label class="role-option" id="label-producer">
+                <input type="radio" name="role" value="producer" onclick="selectRole('producer')">
+                <strong>Producteur</strong>
+            </label>
+        </div>
 
-    <label>Mot de passe</label><br>
-    <input type="password" name="password" required><br><br>
+        <div class="form-group">
+            <label>Pseudo</label>
+            <input type="text" name="username" placeholder="Nom d'artiste" required>
+        </div>
 
-    <label>Confirmer mot de passe</label><br>
-    <input type="password" name="confirm_password" required><br><br>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="votre@email.com" required>
+        </div>
 
-    <button type="submit">Créer le compte</button>
-</form>
+        <div class="form-group">
+            <label>Mot de passe</label>
+            <input type="password" name="password" placeholder="Minimum 8 caractères" required>
+        </div>
 
-<p><a href="<?= base_url('/login') ?>">Déjà un compte ?</a></p>
+        <div class="form-group">
+            <label>Confirmer le mot de passe</label>
+            <input type="password" name="confirm_password" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-beatflow">Créer mon compte</button>
+    </form>
+
+    <p class="footer-text">Déjà inscrit ? <a href="<?= base_url('/login') ?>">Se connecter</a></p>
+</div>
+
+<script>
+    function selectRole(role) {
+        document.getElementById('label-client').classList.remove('active');
+        document.getElementById('label-producer').classList.remove('active');
+        document.getElementById('label-' + role).classList.add('active');
+    }
+</script>
 
 <?= $this->endSection() ?>

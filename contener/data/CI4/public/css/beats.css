@@ -1,0 +1,180 @@
+    .hero {
+            position: relative;
+            height: 500px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500"><rect fill="%23222" width="1200" height="500"/></svg>');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 0 60px;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, rgba(0,0,0,0.6), transparent);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            max-width: 500px;
+        }
+
+        .hero-content h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+
+
+/* Style global des cartes inspiré de .auth-card mais en BLANC */
+body { 
+            background: #ffffff; 
+            color: #1f2937;
+            background-image: none; /* On supprime l'image globale */
+}
+.home-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
+    margin-bottom: 30px;
+    color: #1f2937;
+}
+
+/* Hero Section */
+.hero-section {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 40px auto;
+}
+
+.hero-section h1 {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    color: #111827;
+}
+
+.subtitle {
+    color: #6b7280;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+/* Bouton style "beatflow" (identique à login/register) */
+.btn-beatflow {
+    display: inline-block;
+    padding: 14px 28px;
+    background: var(--primary-blue);
+    color: white !important;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.btn-beatflow:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+/* Grille et Cartes de Beats */
+.section-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    color: #ffffff; /* Pour ressortir sur l'image de fond */
+}
+
+.beats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.beat-card-variant {
+    padding: 20px;
+    transition: 0.3s;
+}
+
+.beat-card-variant:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.beat-card-variant h3 a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+.beat-genre {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 5px 0 15px 0;
+}
+
+.beat-details {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 20px;
+}
+
+.beat-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 15px;
+}
+
+.beat-price {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #111827;
+}
+
+/* Stats Container */
+.stats-container-variant {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item strong {
+    display: block;
+    font-size: 1.8rem;
+    color: var(--primary-blue);
+}
+
+.stat-item span {
+    color: #6b7280;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}

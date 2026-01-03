@@ -18,7 +18,7 @@
         <div class="blob blob-left"></div>
         <div class="blob blob-right"></div>
 
-        <h2>Beatmakers incontournables</h2>
+        <h2 class = "section-title">Beatmakers incontournables</h2>
         <div class = "divider"></div>
         
         <div class="artist-grid">

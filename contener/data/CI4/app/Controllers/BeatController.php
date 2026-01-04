@@ -11,39 +11,35 @@ class BeatController extends BaseController
 {
     public function index()
     {
-        $catModel = new CategoryModel();
-        $categories = $catModel->orderBy('name', 'ASC')->findAll();
-
         $beatModel = new BeatModel();
-
-        $filters = [
-            'q'           => $this->request->getGet('q'),
-            'category_id' => $this->request->getGet('category_id'),
-            'bpm_min'     => $this->request->getGet('bpm_min'),
-            'bpm_max'     => $this->request->getGet('bpm_max'),
-            'musical_key' => $this->request->getGet('musical_key'),
-        ];
-
-        $doSearch = (string)($this->request->getGet('do_search') ?? '') === '1';
-
-        if ($doSearch) {
-            $beats = $beatModel->search($filters);
-        } else {
-            $beats = $beatModel->getDefaultFeed(30);
-        }
+        $beats = $beatModel->getDefaultFeed();
 
         return view('beats/index', [
-            'title'      => 'Boutique',
-            'beats'      => $beats,
-            'filters'    => $filters,
-            'categories' => $categories,
-            'doSearch'   => $doSearch,
+            'title' => 'Boutique',
+            'beats' => $beats,
         ]);
     }
 
     public function search()
     {
-        return $this->index();
+        $filters = [
+            'q' => $this->request->getGet('q'),
+            'category_id' => $this->request->getGet('category_id'),
+            'bpm_min' => $this->request->getGet('bpm_min'),
+            'bpm_max' => $this->request->getGet('bpm_max'),
+            'price_min' => $this->request->getGet('price_min'),
+            'price_max' => $this->request->getGet('price_max'),
+            'musical_key' => $this->request->getGet('musical_key'),
+            'do_search' => 1,
+        ];
+
+        $beatModel = new BeatModel();
+        $beats = $beatModel->search($filters);
+
+        return view('beats/index', [
+            'title' => 'Recherche',
+            'beats' => $beats,
+        ]);
     }
 
     public function show(int $id)
@@ -58,45 +54,20 @@ class BeatController extends BaseController
         $fileModel = new BeatFileModel();
         $previewPath = $fileModel->getPreviewPath($id);
 
-        // ✅ FIX: pas de $this->db dans ce controller -> db_connect()
-        $db = db_connect();
-
-        $suggestions = $db->table('beats b')
-            ->select('b.id, b.title, b.price, b.bpm, b.musical_key')
-            ->where('b.user_id', (int)$beat['user_id'])
-            ->where('b.id !=', (int)$id)
-            ->where('b.status', 'active')
-            ->where('b.buyer_id', null)
-            ->orderBy('b.created_at', 'DESC')
-            ->limit(6)
-            ->get()
-            ->getResultArray();
-
         return view('beats/show', [
-            'title'       => $beat['title'],
-            'beat'        => $beat,
+            'title' => $beat['title'],
+            'beat' => $beat,
             'previewPath' => $previewPath,
-            'suggestions' => $suggestions,
-        ]);
-    }
-
-    public function myBeats()
-    {
-        $userId = (int)(session()->get('user_id') ?? 0);
-        if ($userId <= 0) return redirect()->to('/login');
-
-        $beatModel = new BeatModel();
-        $beats = $beatModel->findBySeller($userId);
-
-        return view('beats/my', [
-            'title' => 'Mes beats',
-            'beats' => $beats,
         ]);
     }
 
     public function createForm()
     {
-        $userId = (int)(session()->get('user_id') ?? 0);
+        if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 64 * 1024 * 1024) {
+            return redirect()->back()->withInput()->with('error', 'Fichier trop volumineux.');
+        }
+
+        $userId = (int) (session()->get('user_id') ?? 0);
         if ($userId <= 0) return redirect()->to('/login');
 
         $catModel = new CategoryModel();
@@ -110,8 +81,13 @@ class BeatController extends BaseController
 
     public function create()
     {
-        $userId = (int)(session()->get('user_id') ?? 0);
+        $userId = (int) (session()->get('user_id') ?? 0);
         if ($userId <= 0) return redirect()->to('/login');
+
+        $title = trim((string) ($this->request->getPost('title') ?? ''));
+        if ($title === '') {
+            return redirect()->back()->withInput()->with('error', 'Titre obligatoire.');
+        }
 
         $data = [
             'user_id'     => $userId,
@@ -119,7 +95,7 @@ class BeatController extends BaseController
             'bpm'         => $this->request->getPost('bpm') !== null ? (int)$this->request->getPost('bpm') : null,
             'musical_key' => trim((string)($this->request->getPost('musical_key') ?? '')) ?: null,
             'tags'        => trim((string)($this->request->getPost('tags') ?? '')) ?: null,
-            'title'       => trim((string)($this->request->getPost('title') ?? '')),
+            'title'       => $title,
             'description' => trim((string)($this->request->getPost('description') ?? '')) ?: null,
             'price'       => (float)($this->request->getPost('price') ?? 0),
             'status'      => 'active',
@@ -127,224 +103,196 @@ class BeatController extends BaseController
             'updated_at'  => date('Y-m-d H:i:s'),
         ];
 
-        if ($data['title'] === '') {
-            return redirect()->back()->withInput()->with('error', 'Titre obligatoire.');
-        }
-
         $beatModel = new BeatModel();
-        $beatModel->insert($data);
-        $beatId = (int)$beatModel->getInsertID();
+        $beatId = (int) $beatModel->insert($data, true);
 
         $fileModel = new BeatFileModel();
 
-        try {
-            $preview = $this->saveBeatUpload(
+        // 1) preview mp3 -> public/uploads/previews/{beatId}
+        $previewInfo = $this->saveUploadToPublic(
+            $beatId,
+            'preview_file',
+            'uploads/previews',
+            ['audio/mpeg', 'audio/mp3'],
+            10 * 1024 * 1024
+        );
+
+        if ($previewInfo) {
+            $fileModel->upsertFile(
                 $beatId,
-                'preview_file',
-                'preview',
-                ['audio/mpeg'],
-                5 * 1024 * 1024
+                'preview_mp3',
+                $previewInfo['relativePath'],
+                $previewInfo['mime'],
+                $previewInfo['sizeBytes'],
+                $previewInfo['sha256']
             );
+        }
 
-            if ($preview !== null) {
-                $this->upsertBeatFile($fileModel, $beatId, 'preview_mp3', $preview['path'], $preview['mime'], (int)$preview['size']);
-            }
+        // 2) master wav -> writable/uploads/masters/{beatId}
+        $masterInfo = $this->saveUploadToWritable(
+            $beatId,
+            'original_file',             
+            'uploads/masters',
+            ['audio/wav', 'audio/x-wav'],
+            50 * 1024 * 1024
+        );
 
-            $original = $this->saveBeatUpload(
+        if ($masterInfo) {
+            $fileModel->upsertFile(
                 $beatId,
-                'original_file',
-                'original',
-                ['audio/mpeg', 'audio/wav'],
-                25 * 1024 * 1024
+                'master_wav',
+                $masterInfo['relativePath'],
+                $masterInfo['mime'],
+                $masterInfo['sizeBytes'],
+                $masterInfo['sha256']
             );
+        }
 
-            if ($original !== null) {
-                $type = ($original['mime'] === 'audio/wav') ? 'original_wav' : 'original_mp3';
-                $this->upsertBeatFile($fileModel, $beatId, $type, $original['path'], $original['mime'], (int)$original['size']);
-            }
-        } catch (\Throwable $e) {
-            return redirect()->to('/my/beats')->with('error', 'Beat créé mais upload échoué : ' . $e->getMessage());
+        // wav + mp3 :
+        if (!$previewInfo || !$masterInfo) {
+            return redirect()->to('/my/beats')->with(
+                'error',
+                'Beat créé mais fichiers incomplets : il faut un MP3 (preview) + un WAV (master).'
+            );
         }
 
         return redirect()->to('/my/beats')->with('success', 'Beat publié.');
     }
 
-    public function editForm(int $id)
+    public function myBeats()
     {
-        $userId = (int)(session()->get('user_id') ?? 0);
+        $userId = (int) (session()->get('user_id') ?? 0);
         if ($userId <= 0) return redirect()->to('/login');
 
         $beatModel = new BeatModel();
-        $beat = $beatModel->find($id);
-        if (!$beat) throw new PageNotFoundException('Beat introuvable.');
+        $beats = $beatModel->findBySeller($userId);
 
-        if ((int)$beat['user_id'] !== $userId) {
-            return redirect()->to('/my/beats')->with('error', 'Accès refusé.');
-        }
-
-        if (!empty($beat['buyer_id']) || ($beat['status'] ?? '') !== 'active') {
-            return redirect()->to('/my/beats')->with('error', 'Beat vendu ou inactif, modification impossible.');
-        }
-
-        $catModel = new CategoryModel();
-
-        return view('beats/form', [
-            'title'      => 'Modifier un beat',
-            'beat'       => $beat,
-            'categories' => $catModel->orderBy('name', 'ASC')->findAll(),
+        return view('beats/my', [
+            'title' => 'Mes beats',
+            'beats' => $beats,
         ]);
     }
 
-    public function update(int $id)
+    /**
+     * Download du WAV uniquement si l’utilisateur est l’acheteur.
+     * URL : /beats/{id}/download
+     */
+    public function download(int $id)
     {
-        $userId = (int)(session()->get('user_id') ?? 0);
+        $userId = (int) (session()->get('user_id') ?? 0);
         if ($userId <= 0) return redirect()->to('/login');
 
         $beatModel = new BeatModel();
         $beat = $beatModel->find($id);
-        if (!$beat) throw new PageNotFoundException('Beat introuvable.');
 
-        if ((int)$beat['user_id'] !== $userId) {
-            return redirect()->to('/my/beats')->with('error', 'Accès refusé.');
+        if (!$beat) {
+            throw new PageNotFoundException('Beat introuvable.');
         }
 
-        if (!empty($beat['buyer_id']) || ($beat['status'] ?? '') !== 'active') {
-            return redirect()->to('/my/beats')->with('error', 'Beat vendu ou inactif, modification impossible.');
+        // Vérif achat
+        if ((int)($beat['buyer_id'] ?? 0) !== $userId) {
+            return redirect()->to('/beats/' . $id)->with('error', "Téléchargement refusé : achat requis.");
         }
-
-        $data = [
-            'category_id' => (int)($this->request->getPost('category_id') ?? 0) ?: null,
-            'bpm'         => $this->request->getPost('bpm') !== null ? (int)$this->request->getPost('bpm') : null,
-            'musical_key' => trim((string)($this->request->getPost('musical_key') ?? '')) ?: null,
-            'tags'        => trim((string)($this->request->getPost('tags') ?? '')) ?: null,
-            'title'       => trim((string)($this->request->getPost('title') ?? '')),
-            'description' => trim((string)($this->request->getPost('description') ?? '')) ?: null,
-            'price'       => (float)($this->request->getPost('price') ?? 0),
-            'updated_at'  => date('Y-m-d H:i:s'),
-        ];
-
-        if ($data['title'] === '') {
-            return redirect()->back()->withInput()->with('error', 'Titre obligatoire.');
-        }
-
-        $beatModel->update($id, $data);
 
         $fileModel = new BeatFileModel();
+        $rel = $fileModel->getMasterPath($id);
 
-        try {
-            $preview = $this->saveBeatUpload(
-                $id,
-                'preview_file',
-                'preview',
-                ['audio/mpeg'],
-                5 * 1024 * 1024
-            );
-
-            if ($preview !== null) {
-                $this->upsertBeatFile($fileModel, $id, 'preview_mp3', $preview['path'], $preview['mime'], (int)$preview['size']);
-            }
-
-            $original = $this->saveBeatUpload(
-                $id,
-                'original_file',
-                'original',
-                ['audio/mpeg', 'audio/wav'],
-                25 * 1024 * 1024
-            );
-
-            if ($original !== null) {
-                $type = ($original['mime'] === 'audio/wav') ? 'original_wav' : 'original_mp3';
-                $this->upsertBeatFile($fileModel, $id, $type, $original['path'], $original['mime'], (int)$original['size']);
-            }
-        } catch (\Throwable $e) {
-            return redirect()->to('/my/beats')->with('error', 'Beat modifié mais upload échoué : ' . $e->getMessage());
+        if (!$rel) {
+            return redirect()->to('/beats/' . $id)->with('error', "Fichier WAV introuvable.");
         }
 
-        return redirect()->to('/my/beats')->with('success', 'Beat mis à jour.');
-    }
-
-    public function delete(int $id)
-    {
-        $userId = (int)(session()->get('user_id') ?? 0);
-        if ($userId <= 0) return redirect()->to('/login');
-
-        $beatModel = new BeatModel();
-        $beat = $beatModel->find($id);
-        if (!$beat) throw new PageNotFoundException('Beat introuvable.');
-
-        if ((int)$beat['user_id'] !== $userId) {
-            return redirect()->to('/my/beats')->with('error', 'Accès refusé.');
+        $abs = WRITEPATH . rtrim($rel, '/\\');
+        if (!is_file($abs)) {
+            return redirect()->to('/beats/' . $id)->with('error', "Fichier WAV manquant sur le serveur.");
         }
 
-        $beatModel->update($id, [
-            'status' => 'deleted',
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
-
-        return redirect()->to('/my/beats')->with('success', 'Beat supprimé.');
+        // force download
+        return $this->response->download($abs, null);
     }
 
-    private function saveBeatUpload(int $beatId, string $inputName, string $kind, array $allowedMime, int $maxBytes): ?array
-    {
+    // -------------------
+    // Helpers upload
+    // -------------------
+
+    private function saveUploadToPublic(
+        int $beatId,
+        string $inputName,
+        string $baseDirRelativeToPublic,
+        array $allowedMimes,
+        int $maxBytes
+    ): ?array {
         $file = $this->request->getFile($inputName);
-
-        if (!$file || $file->getError() === UPLOAD_ERR_NO_FILE) {
+        if (!$file || !$file->isValid() || $file->hasMoved()) {
             return null;
         }
 
-        if (!$file->isValid()) {
-            throw new \RuntimeException("Upload invalide pour $inputName.");
+        $size = (int) $file->getSize();
+        if ($size <= 0 || $size > $maxBytes) {
+            throw new \RuntimeException("Fichier trop gros (max " . (int)($maxBytes / 1024 / 1024) . "MB).");
         }
 
-        if ($file->getSize() > $maxBytes) {
-            throw new \RuntimeException("Fichier trop lourd pour $inputName.");
+        $mime = (string) $file->getMimeType();
+        if (!in_array($mime, $allowedMimes, true)) {
+            throw new \RuntimeException("Type de fichier invalide ($mime).");
         }
 
-        $mime = $file->getClientMimeType();
-        if (!in_array($mime, $allowedMime, true)) {
-            throw new \RuntimeException("Type de fichier non autorisé pour $inputName.");
+        $targetDir = rtrim(FCPATH, '/\\') . '/' . trim($baseDirRelativeToPublic, '/\\') . '/' . $beatId;
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0775, true);
         }
 
-        $dir = FCPATH . 'uploads/beats/' . $beatId;
-        if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
-        }
+        $newName = $file->getRandomName();
+        $file->move($targetDir, $newName);
 
-        $ext = strtolower($file->getExtension());
-        $filename = ($kind === 'preview') ? "preview.$ext" : "original.$ext";
-
-        $file->move($dir, $filename, true);
+        $relative = trim($baseDirRelativeToPublic, '/\\') . '/' . $beatId . '/' . $newName;
+        $abs = $targetDir . '/' . $newName;
 
         return [
-            'path' => 'uploads/beats/' . $beatId . '/' . $filename,
+            'relativePath' => $relative,
             'mime' => $mime,
-            'size' => $file->getSize(),
+            'sizeBytes' => $size,
+            'sha256' => hash_file('sha256', $abs),
         ];
     }
 
-    private function upsertBeatFile(BeatFileModel $fileModel, int $beatId, string $type, string $path, string $mime, int $sizeBytes): void
-    {
-        $now = date('Y-m-d H:i:s');
-
-        $row = $fileModel->where('beat_id', $beatId)
-            ->where('type', $type)
-            ->first();
-
-        $payload = [
-            'beat_id' => $beatId,
-            'type' => $type,
-            'path' => $path,
-            'mime_type' => $mime,
-            'size_bytes' => $sizeBytes,
-            'duration_sec' => null,
-            'created_at' => $now,
-        ];
-
-        if ($row) {
-            unset($payload['created_at']);
-            $fileModel->update((int)$row['id'], $payload);
-        } else {
-            $fileModel->insert($payload);
+    private function saveUploadToWritable(
+        int $beatId,
+        string $inputName,
+        string $baseDirRelativeToWritable,
+        array $allowedMimes,
+        int $maxBytes
+    ): ?array {
+        $file = $this->request->getFile($inputName);
+        if (!$file || !$file->isValid() || $file->hasMoved()) {
+            return null;
         }
+
+        $size = (int) $file->getSize();
+        if ($size <= 0 || $size > $maxBytes) {
+            throw new \RuntimeException("Fichier trop gros (max " . (int)($maxBytes / 1024 / 1024) . "MB).");
+        }
+
+        $mime = (string) $file->getMimeType();
+        if (!in_array($mime, $allowedMimes, true)) {
+            throw new \RuntimeException("Type de fichier invalide ($mime).");
+        }
+
+        $targetDir = rtrim(WRITEPATH, '/\\') . '/' . trim($baseDirRelativeToWritable, '/\\') . '/' . $beatId;
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0775, true);
+        }
+
+        $newName = $file->getRandomName();
+        $file->move($targetDir, $newName);
+
+        $relative = trim($baseDirRelativeToWritable, '/\\') . '/' . $beatId . '/' . $newName;
+        $abs = $targetDir . '/' . $newName;
+
+        return [
+            'relativePath' => $relative,
+            'mime' => $mime,
+            'sizeBytes' => $size,
+            'sha256' => hash_file('sha256', $abs),
+        ];
     }
 }

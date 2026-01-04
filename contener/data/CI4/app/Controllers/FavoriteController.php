@@ -55,7 +55,6 @@ class FavoriteController extends BaseController
     }
 
     /**
-     * Compat anciennes routes :
      * POST /favorites/{beatId}/add
      */
     public function add(int $beatId)
@@ -72,7 +71,6 @@ class FavoriteController extends BaseController
     }
 
     /**
-     * Compat anciennes routes :
      * POST /favorites/{beatId}/remove
      */
     public function remove(int $beatId)

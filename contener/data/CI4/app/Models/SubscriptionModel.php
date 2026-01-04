@@ -24,4 +24,12 @@ class SubscriptionModel extends Model
             ->where('status', 'active')
             ->first();
     }
+
+    public function getAnyActive(int $userId): ?array
+    {
+        return $this->where('user_id', $userId)
+            ->where('status', 'active')
+            ->first();
+    }
+
 }

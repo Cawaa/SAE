@@ -7,7 +7,7 @@ use App\Models\BeatModel;
 class BoutiqueController extends BaseController
 {
     /**
-     * Alias possible d'une page "boutique" (sinon tu peux ignorer ce controller)
+     * Alias possible d'une page "boutique"
      */
     public function index()
     {

@@ -40,7 +40,7 @@ class AuthController extends BaseController
         }
 
 
-        // On set la session (compatible avec ton layout)
+        // On set la session 
         session()->set([
             'user_id'    => (int) $user['id'],
             'username'   => (string) $user['username'],
@@ -86,7 +86,7 @@ class AuthController extends BaseController
             return redirect()->to('/register')->with('error', 'Email déjà utilisé.');
         }
 
-        // (optionnel) vérifier username unique
+        // vérifier username unique
         $existingUser = $userModel->where('username', $username)->first();
         if ($existingUser) {
             return redirect()->to('/register')->with('error', 'Pseudo déjà utilisé.');
@@ -103,7 +103,7 @@ class AuthController extends BaseController
         $userModel->insert($data);
         $newId = (int) $userModel->getInsertID();
 
-        // auto-login après register (comme beaucoup de TD)
+        // auto-login après register 
         session()->set([
             'user_id'    => $newId,
             'username'   => $username,
@@ -116,7 +116,7 @@ class AuthController extends BaseController
 
     public function logout()
     {
-        // version TD : on vide les clés
+        // on vide les clés
         session()->remove(['user_id', 'username', 'role', 'isLoggedIn']);
         return redirect()->to('/');
     }

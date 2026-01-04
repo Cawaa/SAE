@@ -24,7 +24,6 @@ class MessageController extends BaseController
 
         $convModel = new ConversationModel();
         if (!$convModel->isParticipant($conversationId, $userId)) {
-            // style TD : redirection simple
             return redirect()->to('/conversations')->with('error', 'Accès refusé.');
         }
 

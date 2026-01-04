@@ -16,10 +16,7 @@ class HomeController extends BaseController
             'title'      => 'Accueil',
             'categories' => $homeModel->getTopCategories(8),
             'beats'      => $beats,
-
-            // compat si ta view ou ton CSS utilise encore "listings"
             'listings'   => $beats,
-
             'stats'      => $homeModel->getStats(),
         ];
 

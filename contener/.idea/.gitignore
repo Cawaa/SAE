@@ -15,5 +15,3 @@ contener/data/CI4/writable/
 contener/data/CI4/.env
 contener/data/CI4/env
 
-# archives
-*.zip

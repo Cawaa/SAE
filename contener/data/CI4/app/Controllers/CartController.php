@@ -154,7 +154,6 @@ class CartController extends BaseController
 
         $db->transBegin();
         try {
-            // Total (cents)
             $totalCents = 0;
             foreach ($rows as $r) {
                 $totalCents += (int)round(((float)$r['price']) * 100) * (int)$r['quantite'];
@@ -215,7 +214,7 @@ class CartController extends BaseController
 
 
     /**
-     * Retourne [cartId, isLoggedIn] et crée/merge si besoin.
+     * Retourne [cartId, isLoggedIn]
      */
     private function getOrCreateCartId(): array
     {
@@ -242,7 +241,7 @@ class CartController extends BaseController
                 $userCart = $db->table('carts')->where('user_id', $userId)->get()->getRowArray();
             }
 
-            // merge guest cart into user cart (si cookie existe)
+            // merge guest cart dans user cart 
             if (!empty($guestToken)) {
                 $guestCart = $db->table('carts')->where('guest_token', $guestToken)->get()->getRowArray();
                 if ($guestCart && (int)$guestCart['id'] !== (int)$userCart['id']) {

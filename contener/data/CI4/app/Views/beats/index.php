@@ -55,9 +55,9 @@
 
 <p style="color: #64748b; font-weight: 600; margin-bottom: 20px;">
     <?php if (empty($doSearch)) : ?>
-        ✨ Propositions de beats
+         Propositions de beats
     <?php else : ?>
-        🔍 Résultats de la recherche
+         Résultats de la recherche
     <?php endif; ?>
 </p>
 
@@ -78,9 +78,9 @@
                     </div>
 
                     <div class="beat-info">
-                        <span class="info-tag">📁 <?= esc($b['category_name'] ?? 'Inconnu') ?></span>
-                        <span class="info-tag">🥁 <?= esc($b['bpm'] ?? '—') ?> BPM</span>
-                        <span class="info-tag">🎹 <?= esc($b['musical_key'] ?? '—') ?></span>
+                        <span class="info-tag"> <?= esc($b['category_name'] ?? 'Inconnu') ?></span>
+                        <span class="info-tag"> <?= esc($b['bpm'] ?? '—') ?> BPM</span>
+                        <span class="info-tag"> <?= esc($b['musical_key'] ?? '—') ?></span>
                     </div>
                 </div>
 

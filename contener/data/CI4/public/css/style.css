@@ -13,7 +13,6 @@ body {
     background-position: center;
     background-attachment: fixed;
     min-height: 100vh;
-    color: white;
 }
 
 nav { 
@@ -35,6 +34,7 @@ nav a { color: black; text-decoration: none; margin-left: 20px; font-weight: 500
 .container { 
     width: 100%;
     margin: 0 auto;
+    color: #111;
 }
 
 .footer-text { text-align: center; margin-top: 25px; color: var(--text-gray); font-size: 0.85rem; }

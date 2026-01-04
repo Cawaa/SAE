@@ -16,9 +16,9 @@
       <div class="artist-card">
         <div class="artist-avatar">
           <?php if (!empty($u['avatar'])): ?>
-            <img src="<?= esc($u['avatar']) ?>" alt="Avatar">
+            <img src="<?= base_url('images/' . esc($u['avatar'])) ?>" alt="Avatar">
           <?php else: ?>
-            <img src="<?= base_url('images/default-avatar.png') ?>" alt="Avatar">
+            <img src="<?= base_url('images/default.png') ?>" alt="Avatar">
           <?php endif; ?>
         </div>
 
@@ -49,7 +49,7 @@
     <?php foreach ($topPosters as $u): ?>
       <div class="artist-card">
         <div class="artist-avatar">
-          <img src="<?= !empty($u['avatar']) ? esc($u['avatar']) : base_url('images/default-avatar.png') ?>" alt="Avatar">
+          <img src="<?= !empty($u['avatar']) ? base_url('images/' . esc($u['avatar'])) : base_url('images/default.png') ?>" alt="Avatar">
         </div>
 
         <div class="artist-name"><?= esc($u['username']) ?></div>

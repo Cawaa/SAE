@@ -5,6 +5,12 @@ body {
     color: #1a1a1a !important;
 }
 
+.container{
+    margin-left: 10%;
+    margin-right: 10%;
+    width: auto;
+}
+
 h1 {
     color: var(--primary-blue);
     font-weight: 800;

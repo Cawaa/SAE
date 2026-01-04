@@ -25,8 +25,7 @@ if ($session->get('isLoggedIn')) {
 
     <style>
         body { 
-            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                              url('<?= base_url("images/image_accueil.jpg") ?>');
+            background-color: white;
         }
     </style>
 </head>

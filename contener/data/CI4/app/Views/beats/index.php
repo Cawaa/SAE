@@ -14,7 +14,7 @@
 </div>
 
 <div class="search-container">
-    <form method="GET" action="<?= base_url('/beats') ?>" class="search-form">
+    <form method="GET" action="<?= base_url('/beats/search') ?>" class="search-form">
         <input type="hidden" name="do_search" value="1">
 
         <div class="form-group">

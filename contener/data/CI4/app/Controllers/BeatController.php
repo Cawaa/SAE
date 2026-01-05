@@ -12,33 +12,43 @@ class BeatController extends BaseController
     public function index()
     {
         $beatModel = new BeatModel();
+        $catModel = new CategoryModel(); 
+
         $beats = $beatModel->getDefaultFeed();
 
         return view('beats/index', [
-            'title' => 'Boutique',
-            'beats' => $beats,
+            'title'      => 'Boutique',
+            'beats'      => $beats,
+            'categories' => $catModel->orderBy('name', 'ASC')->findAll(), 
+            'filters'    => [],   
+            'doSearch'   => false, 
         ]);
     }
 
     public function search()
     {
         $filters = [
-            'q' => $this->request->getGet('q'),
+            'q'           => $this->request->getGet('q'),
             'category_id' => $this->request->getGet('category_id'),
-            'bpm_min' => $this->request->getGet('bpm_min'),
-            'bpm_max' => $this->request->getGet('bpm_max'),
-            'price_min' => $this->request->getGet('price_min'),
-            'price_max' => $this->request->getGet('price_max'),
+            'bpm_min'     => $this->request->getGet('bpm_min'),
+            'bpm_max'     => $this->request->getGet('bpm_max'),
+            'price_min'   => $this->request->getGet('price_min'),
+            'price_max'   => $this->request->getGet('price_max'),
             'musical_key' => $this->request->getGet('musical_key'),
-            'do_search' => 1,
+            'do_search'   => 1,
         ];
 
         $beatModel = new BeatModel();
+        $catModel = new CategoryModel(); 
+
         $beats = $beatModel->search($filters);
 
         return view('beats/index', [
-            'title' => 'Recherche',
-            'beats' => $beats,
+            'title'      => 'Recherche',
+            'beats'      => $beats,
+            'categories' => $catModel->orderBy('name', 'ASC')->findAll(), 
+            'filters'    => $filters, 
+            'doSearch'   => true,
         ]);
     }
 

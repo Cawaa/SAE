@@ -95,7 +95,7 @@ class AuthController extends BaseController
         $data = [
             'email'         => $email,
             'username'      => $username,
-            'password_hash' => hash('sha256', $password),
+            'password_hash' => password_hash($password, PASSWORD_BCRYPT),
             'role'          => 'user',
             'created_at'    => date('Y-m-d H:i:s'),
         ];

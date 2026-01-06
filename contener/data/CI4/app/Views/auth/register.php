@@ -32,7 +32,7 @@
 
         <div class="form-group">
             <label>Pseudo</label>
-            <input type="text" name="username" placeholder="Nom d'artiste" required>
+            <input type="text" name="username" placeholder="Pseudo ou nom d'artiste" required>
         </div>
 
         <div class="form-group">
@@ -42,7 +42,7 @@
 
         <div class="form-group">
             <label>Mot de passe</label>
-            <input type="password" name="password" placeholder="Minimum 8 caractères" required>
+            <input type="password" name="password" placeholder="Entrez votre mot de passe" required>
         </div>
 
         <div class="form-group">

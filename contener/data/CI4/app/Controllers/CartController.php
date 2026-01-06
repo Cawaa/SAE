@@ -3,6 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\CartItemModel;
+use App\Events\EventDispatcher;
+use App\Events\AchatTermineEvent;
+use App\Events\Observers\InventoryManager;
+use App\Events\Observers\NotificationService;
 
 class CartController extends BaseController
 {
@@ -155,6 +159,8 @@ class CartController extends BaseController
         $db->transBegin();
         try {
             $totalCents = 0;
+            $orderItems = [];
+
             foreach ($rows as $r) {
                 $totalCents += (int)round(((float)$r['price']) * 100) * (int)$r['quantite'];
             }
@@ -193,10 +199,13 @@ class CartController extends BaseController
                     'created_at'  => date('Y-m-d H:i:s'),
                 ]);
 
-                $db->table('beats')->where('id', $beatId)->update([
-                    'buyer_id' => $userId,
-                    'sold_at'  => date('Y-m-d H:i:s'),
-                ]);
+                // Ajouter aux infos de l'événement
+                $orderItems[] = [
+                    'beatId'      => $beatId,
+                    'sellerId'    => (int)$fresh['user_id'],
+                    'beat_title'  => $fresh['title'],
+                    'price_cents' => $priceCents,
+                ];
             }
 
             // Clear cart
@@ -204,6 +213,20 @@ class CartController extends BaseController
             $db->table('carts')->where('id', $cartId)->update(['updated_at' => date('Y-m-d H:i:s')]);
 
             $db->transCommit();
+
+            // ===== PATTERN OBSERVER =====
+            // Créer l'événement d'achat terminé
+            $event = new AchatTermineEvent($orderId, $userId, $orderItems);
+
+            // Créer le dispatcher et enregistrer les observateurs
+            $dispatcher = new EventDispatcher();
+            $dispatcher->attach(new InventoryManager());
+            $dispatcher->attach(new NotificationService());
+
+            // Notifier tous les observateurs
+            $dispatcher->notify($event);
+            // ===== FIN PATTERN OBSERVER =====
+
         } catch (\Throwable $e) {
             $db->transRollback();
             return redirect()->to('/cart')->with('error', 'Checkout impossible : ' . $e->getMessage());

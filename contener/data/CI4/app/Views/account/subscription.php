@@ -1,50 +1,58 @@
 <?= $this->extend('layouts/main') ?>
+<?= $this->section('extra-css') ?>
+    <link rel="stylesheet" href="<?= base_url('css/account.css') ?>">
+<?= $this->endSection() ?>
 <?= $this->section('content') ?>
 
-<h1>Abonnement</h1>
+<div class="container">
+    <h1>Abonnement</h1>
 
-<h3>Attention, l'achat d'un abonnement n'est pas remboursable ! </h3>
+    <div class="message-info">
+        <strong>Attention :</strong> L'achat d'un abonnement n'est pas remboursable !
+    </div>
 
-<?php if ($msg = session()->getFlashdata('success')) : ?>
-    <p style="color:green;"><?= esc($msg) ?></p>
-<?php endif; ?>
-<?php if ($msg = session()->getFlashdata('error')) : ?>
-    <p style="color:red;"><?= esc($msg) ?></p>
-<?php endif; ?>
+    <?php if ($msg = session()->getFlashdata('success')) : ?>
+        <div class="message-success"><?= esc($msg) ?></div>
+    <?php endif; ?>
+    <?php if ($msg = session()->getFlashdata('error')) : ?>
+        <div class="message-error"><?= esc($msg) ?></div>
+    <?php endif; ?>
 
-<?php if (empty($subscription)) : ?>
-    <p><strong>Statut :</strong> Aucun abonnement actif.</p>
-<?php else: ?>
-    <p><strong>Statut :</strong> Abonnement actif</p>
-    <p><strong>Type :</strong> <?= esc($subscription['type'] ?? '—') ?></p>
-    <p><strong>Début :</strong> <?= esc($subscription['started_at'] ?? '—') ?></p>
-    <p><strong>Fin :</strong> <?= esc($subscription['ends_at'] ?? '—') ?></p>
-<?php endif; ?>
+    <h2>📋 Statut actuel</h2>
+    <?php if (empty($subscription)) : ?>
+        <div class="empty-state">
+            <p><strong>Aucun abonnement actif.</strong></p>
+        </div>
+    <?php else: ?>
+        <div class="stat-card">
+            <p><strong>Type :</strong> <?= esc($subscription['type'] ?? '—') ?></p>
+            <p><strong>Début :</strong> <?= esc($subscription['started_at'] ?? '—') ?></p>
+            <p><strong>Fin :</strong> <?= esc($subscription['ends_at'] ?? '—') ?></p>
+        </div>
+    <?php endif; ?>
 
-<hr>
+    <h2>💳 Acheter un abonnement</h2>
+    <p>Choisissez une offre pour activer ou prolonger votre abonnement (simulation sans paiement réel).</p>
 
-<h2>Acheter un abonnement (simulation)</h2>
-<p>
-    Ici, on simule l’achat : cliquer active (ou prolonge) un abonnement en base, sans paiement réel.
-</p>
+    <form method="post" action="<?= site_url('/account/subscription/buy') ?>">
+        <?= csrf_field() ?>
 
-<form method="post" action="<?= site_url('/account/subscription/buy') ?>">
-    <?= csrf_field() ?>
+        <div class="form-group">
+            <label for="type">Offre :</label>
+            <select name="type" id="type">
+                <option value="premium">Premium (30 jours)</option>
+                <option value="pro">Pro (30 jours)</option>
+            </select>
+        </div>
 
-    <label for="type">Choisir une offre :</label>
-    <select name="type" id="type">
-        <option value="premium">Premium (30 jours)</option>
-        <option value="pro">Pro (30 jours)</option>
-    </select>
+        <button type="submit" class="btn">Activer / Prolonger</button>
+    </form>
 
-    <button type="submit">Activer / Prolonger</button>
-</form>
-</p>
-    Pour annuler un abonnement merci de nous contacter. 
-<p>
-<p style="margin-top:1rem;">
-    <a href="<?= site_url('/account') ?>">← Retour Mon compte</a>
+    <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+        <small>Pour annuler un abonnement, merci de nous contacter.</small>
+    </p>
 
-
+    <a href="<?= site_url('/account') ?>" class="back-link">← Retour Mon compte</a>
+</div>
 
 <?= $this->endSection() ?>

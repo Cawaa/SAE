@@ -17,19 +17,7 @@
 
     <form method="post" action="<?= base_url('/register') ?>">
         <?= csrf_field() ?>
-
-        <label style="display:block; margin-bottom:8px; font-size:0.9rem;">Je suis un :</label>
-        <div class="role-selector">
-            <label class="role-option active" id="label-client">
-                <input type="radio" name="role" value="client" checked onclick="selectRole('client')">
-                <strong>Client</strong>
-            </label>
-            <label class="role-option" id="label-producer">
-                <input type="radio" name="role" value="producer" onclick="selectRole('producer')">
-                <strong>Producteur</strong>
-            </label>
-        </div>
-
+        
         <div class="form-group">
             <label>Pseudo</label>
             <input type="text" name="username" placeholder="Pseudo ou nom d'artiste" required>

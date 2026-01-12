@@ -1,7 +1,7 @@
 # Avant de push 
 ## Toujours vérifier que le dossier vendor n'est pas listé dans les fichiers commited dans la commande git status
 
-Si c'est le cas faire `git rm -r --cached data/vendor`
+Si c'est le cas faire `git rm -r --cached data/CI4/vendor`
 
 ## Pour lancer le projet :
 1. Si ce n'est pas fait copier coller le fichier `env` et le renommer `.env` dans data/CI4 et décommentez les lignes comme suivant (si cela n'est pas fait) : 
@@ -28,6 +28,13 @@ database.default.port = 3306
 7. Taper la commande `php spark migrate`
 8. Taper la commande `php spark db:seed DatabaseSeeder`
 
+Si la commande php spark migrate ne passe pas, c'est sans doute parce que writable n'est pas crée automatiquement. Pour créer writable et tout ce dont ont à besoin dedans (dans le terminal du conteneur): 
+`mkdir -p writable/{cache,logs,session,uploads}`
+`mkdir -p writable/uploads/{masters,previews}`
+`touch writable/index.html`
+`chown -R www-data:www-data writable`
+`chmod -R 775 writable`
+
 Ce dépôt contient l'application **CodeIgniter 4 (CI4)** et l'environnement de conteneurisation basé sur **Podman** pour le développement.
 
 L'environnement comprend trois services :
@@ -41,7 +48,8 @@ L'environnement comprend trois services :
 
 ### 🚨 Important
 
-  * **Toutes les modifications du code CI4** doivent se faire dans le dossier local `data/CI4/`.
+  * **Toutes les modifications du code CI4** doivent se faire dans les dossiers du conteneur `/var/www/html/CI4/`.
+  * Il faut push au début et pull à la fin d'une session de travail.
   * Le dossier `data/CI4/` correspond à `/var/www/html/CI4/` à l'intérieur du conteneur.
 
 -----
@@ -75,7 +83,6 @@ cd contener
 | Service | Accès | Description |
 | :--- | :--- | :--- |
 | **CodeIgniter 4** | `http://localhost:8081` | Le Virtual Host CodeIgniter. |
-| **Test de connexion** | `http://localhost:8080/test_connexion.php` | Vérification de la connexion `php` au service `mysql`. |
 | **phpMyAdmin** | `http://localhost:8082` | Gestion de la base de données. |
 
 ### C. Workflow de Développement (Synchronisation du Code)

@@ -16,8 +16,9 @@ class CartItemModel extends Model
     public function getDetailedItems(int $cartId): array
     {
         return $this->db->table('cart_items ci')
-            ->select('ci.id, ci.cart_id, ci.beat_id, ci.quantite, ci.created_at, b.title, b.price, b.status, b.buyer_id')
+            ->select('ci.id, ci.cart_id, ci.beat_id, ci.quantite, ci.created_at, b.title, b.price, b.status, b.buyer_id, u.username')
             ->join('beats b', 'b.id = ci.beat_id')
+            ->join('users u', 'u.id = b.user_id')
             ->where('ci.cart_id', $cartId)
             ->orderBy('ci.created_at', 'DESC')
             ->get()

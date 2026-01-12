@@ -13,10 +13,10 @@
 <?php endif; ?>
 
 <?php
-    $isEdit = !empty($beat['id']);
-    $action = $isEdit
-        ? base_url('/beats/' . (int)$beat['id'] . '/edit')
-        : base_url('/beats/create');
+$isEdit = !empty($beat['id']);
+$action = $isEdit
+    ? base_url('/beats/' . (int)$beat['id'] . '/edit')
+    : base_url('/beats/create');
 ?>
 
 <form method="POST" action="<?= esc($action) ?>" enctype="multipart/form-data">
@@ -54,16 +54,16 @@
 
     <hr>
     <h3>Fichiers audio</h3>
-    <p><em>Le preview sert à l’écoute. L’original est livré après achat (plus tard on gérera ça).</em></p>
+    <p><em>Preview = écoute (MP3). Master = fichier livré après achat (WAV).</em></p>
 
-    <label>Preview (MP3 uniquement)</label><br>
-    <input type="file" name="preview_file" accept="audio/mpeg"><br>
-    <small>Max 5 MB. <?= $isEdit ? 'Laisser vide pour garder le fichier actuel.' : '' ?></small>
+    <label>Preview (MP3 obligatoire)</label><br>
+    <input type="file" name="preview_file" accept="audio/mpeg,audio/mp3" <?= $isEdit ? '' : 'required' ?>><br>
+    <small><?= $isEdit ? 'Laisser vide pour garder le fichier actuel.' : '' ?></small>
     <br><br>
 
-    <label>Original (MP3 ou WAV)</label><br>
-    <input type="file" name="original_file" accept="audio/mpeg,audio/wav"><br>
-    <small>Max 25 MB. <?= $isEdit ? 'Laisser vide pour garder le fichier actuel.' : '' ?></small>
+    <label>Master (WAV obligatoire)</label><br>
+    <input type="file" name="original_file" accept="audio/wav,audio/x-wav" <?= $isEdit ? '' : 'required' ?>><br>
+    <small><?= $isEdit ? 'Laisser vide pour garder le fichier actuel.' : '' ?></small>
     <br><br>
 
     <button type="submit"><?= $isEdit ? 'Enregistrer' : 'Créer' ?></button>

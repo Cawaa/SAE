@@ -19,6 +19,20 @@ database.default.DBDriver = MySQLi
 database.default.DBPrefix =
 database.default.port = 3306
 ```
+
+Dans eq_1_04_bracq-noe_devillers-tino_dufresne-elric_martin-sacha\contener\data\mescripts\
+J'ai modifié les scripts pour ne pas avoir à faire pleins de commandes dans le terminal CI4/
+Pour l'instant ça focntionne sur mon Windows mais je n'ai pas encore éssayé sous Linux.
+2. Lancer le script create.sh
+3. Lancer le script push.sh
+4. Lancer le script terminal.sh
+5. Une fois dans le terminal aller dans le dossier `CI4`
+6. Taper la commande `php spark migrate`
+7. Taper la commande `php spark db:seed DatabaseSeeder`
+
+
+
+Si ça ne fonctionne pas, il faut suivre ces étapes et taper ces commandes à la main : 
 2. Lancer le script create.sh
 3. Lancer le script push.sh
 4. Lancer le script terminal.sh
@@ -28,12 +42,21 @@ database.default.port = 3306
 7. Taper la commande `php spark migrate`
 8. Taper la commande `php spark db:seed DatabaseSeeder`
 
-Si la commande php spark migrate ne passe pas, c'est sans doute parce que writable n'est pas crée automatiquement. Pour créer writable et tout ce dont ont à besoin dedans (dans le terminal du conteneur): 
-`mkdir -p writable/{cache,logs,session,uploads}`
-`mkdir -p writable/uploads/{masters,previews}`
-`touch writable/index.html`
-`chown -R www-data:www-data writable`
-`chmod -R 775 writable`
+## 🛠️ Problème courant : dossier `writable` ou permissions
+
+Si `php spark migrate` échoue, c’est souvent parce que les dossiers nécessaires n’existent pas.
+
+Créer manuellement **les dossiers requis** writable/uploads/masters et public/uploads/preview avec les bonnes permissions:
+
+```bash
+mkdir -p writable/{cache,logs,session,uploads}
+mkdir -p writable/uploads/masters
+mkdir -p public/uploads/previews
+
+chown -R www-data:www-data writable public/uploads
+chmod -R 775 writable public/uploads
+```
+
 
 Ce dépôt contient l'application **CodeIgniter 4 (CI4)** et l'environnement de conteneurisation basé sur **Podman** pour le développement.
 

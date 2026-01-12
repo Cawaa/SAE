@@ -1,13 +1,14 @@
 <?= $this->extend('layouts/main') ?>
 
 <?= $this->section('extra-css') ?>
-    <link rel="stylesheet" href="<?= base_url('css/boutique.css') ?>">
+<link rel="stylesheet" href="<?= base_url('css/boutique.css') ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
     <h1><?= esc($title ?? 'Boutique') ?></h1>
+
     <?php if (session()->get('user_id')) : ?>
         <a href="<?= base_url('/beats/create') ?>" class="btn-publish">+ Publier un beat</a>
     <?php endif; ?>
@@ -45,6 +46,16 @@
         </div>
 
         <div class="form-group">
+            <label>Prix Min</label>
+            <input type="number" step="0.01" name="price_min" value="<?= esc($filters['price_min'] ?? '') ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Prix Max</label>
+            <input type="number" step="0.01" name="price_max" value="<?= esc($filters['price_max'] ?? '') ?>">
+        </div>
+
+        <div class="form-group">
             <label>Clé</label>
             <input type="text" name="musical_key" placeholder="ex: Am" value="<?= esc($filters['musical_key'] ?? '') ?>">
         </div>
@@ -55,9 +66,9 @@
 
 <p style="color: #64748b; font-weight: 600; margin-bottom: 20px;">
     <?php if (empty($doSearch)) : ?>
-         Propositions de beats
+        Propositions de beats
     <?php else : ?>
-         Résultats de la recherche
+        Résultats de la recherche
     <?php endif; ?>
 </p>
 
@@ -72,15 +83,15 @@
                 <div>
                     <div class="beat-header">
                         <a href="<?= base_url('/beats/' . (int)$b['id']) ?>" class="beat-title">
-                            <?= esc($b['title']) ?>
+                            <?= esc($b['title'] ?? '') ?>
                         </a>
-                        <span class="beat-price"><?= esc($b['price']) ?>€</span>
+                        <span class="beat-price"><?= esc($b['price'] ?? '—') ?>€</span>
                     </div>
 
                     <div class="beat-info">
-                        <span class="info-tag"> <?= esc($b['category_name'] ?? 'Inconnu') ?></span>
-                        <span class="info-tag"> <?= esc($b['bpm'] ?? '—') ?> BPM</span>
-                        <span class="info-tag"> <?= esc($b['musical_key'] ?? '—') ?></span>
+                        <span class="info-tag"><?= esc($b['category_name'] ?? 'Sans genre') ?></span>
+                        <span class="info-tag"><?= esc($b['bpm'] ?? '—') ?> BPM</span>
+                        <span class="info-tag"><?= esc($b['musical_key'] ?? '—') ?></span>
                     </div>
                 </div>
 

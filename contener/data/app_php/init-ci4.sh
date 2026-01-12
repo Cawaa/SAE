@@ -11,13 +11,12 @@ fi
 
 # 2) Dossiers writable
 echo "[init] ensure writable folders..."
-mkdir -p writable/cache writable/logs writable/session writable/uploads
-mkdir -p writable/uploads/masters writable/uploads/previews
-touch writable/index.html
+mkdir -p public/uploads/previews
+mkdir -p writable/uploads/masters
 
 # 3) Droits (Apache tourne en www-data)
-chown -R www-data:www-data writable
-chmod -R 775 writable
+chown -R www-data:www-data public/uploads writable/uploads
+chmod -R 775 public/uploads writable/uploads
 
 # 4) Migrations / seeds (idempotent)
 echo "[init] migrate..."

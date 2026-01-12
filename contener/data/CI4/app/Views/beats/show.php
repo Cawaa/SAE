@@ -9,7 +9,7 @@
 <div class="beat-details-container">
     <div class="beat-main-info">
         <h1><?= esc($beat['title']) ?></h1>
-        
+
         <?php if ($beat['status'] !== 'active' || !empty($beat['buyer_id'])) : ?>
             <p style="color: #e11d48; font-weight: bold;">⚠️ VENDU / INDISPONIBLE</p>
         <?php endif; ?>
@@ -21,10 +21,9 @@
         </div>
 
         <?php if (!empty($previewPath)) : ?>
-            <h3>Écoute (preview)</h3>
-            <audio controls preload="none">
-                <source src="<?= base_url($previewPath) ?>" type="audio/mpeg">
-            </audio>
+            <audio controls preload="metadata" src="<?= base_url($previewPath) ?>"></audio>
+        <?php else : ?>
+            <p><em>Aucune preview disponible.</em></p>
         <?php endif; ?>
 
         <h3>Description</h3>
@@ -40,7 +39,7 @@
 
         <?php if (session()->get('user_id')) : ?>
             <?php if ((int)session()->get('user_id') === (int)$beat['user_id']) : ?>
-                <a href="<?= base_url('/beats/' . (int)$beat['id'] . '/edit') ?>" class="btn-action btn-contact">Modifier le beat</a>
+                <a href="<?= site_url('/account/beats/' . (int)$beat['id'] . '/edit') ?>" class="btn-action btn-contact">Modifier le beat</a>
             <?php else : ?>
                 <form method="POST" action="<?= base_url('/cart/add/' . (int)$beat['id']) ?>">
                     <?= csrf_field() ?>
@@ -60,11 +59,12 @@
         <?php else : ?>
             <a href="<?= base_url('/login') ?>" class="btn-action btn-cart">Connectez-vous pour acheter</a>
         <?php endif; ?>
-        
+
         <div style="margin-top: 30px; border-top: 1px solid #f1f5f9; padding-top: 20px;">
             <p>Vendeur : <strong><?= esc($beat['seller_username'] ?? 'N/A') ?></strong></p>
             <a href="<?= base_url('/beats') ?>" style="color: var(--primary-blue); text-decoration: none;">← Retour boutique</a>
         </div>
     </div>
 </div>
+
 <?= $this->endSection() ?>

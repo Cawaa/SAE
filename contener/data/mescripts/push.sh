@@ -17,12 +17,15 @@ if [ ! -d vendor ]; then
   composer install --no-interaction --prefer-dist
 fi
 
-# writable + permissions
+# Dossiers nécessaires
 mkdir -p writable/{cache,logs,session,uploads}
-mkdir -p writable/uploads/{masters,previews}
-touch writable/index.html
-chown -R www-data:www-data writable
-chmod -R 775 writable
+mkdir -p writable/uploads/masters
+mkdir -p public/uploads/previews
+
+# Permissions (important : public/uploads aussi)
+chown -R www-data:www-data writable public/uploads || true
+chmod -R 775 writable public/uploads || true
+"
 
 # migrations + seed
 php spark migrate --all

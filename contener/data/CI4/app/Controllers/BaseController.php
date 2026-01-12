@@ -7,6 +7,8 @@ use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\Database\ConnectionInterface;
+use Config\Database;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -22,37 +24,36 @@ use Psr\Log\LoggerInterface;
 abstract class BaseController extends Controller
 {
     /**
-     * Instance of the main Request object.
+     * Instance principale de la Request.
      *
      * @var CLIRequest|IncomingRequest
      */
     protected $request;
 
     /**
-     * An array of helpers to be loaded automatically upon
-     * class instantiation. These helpers will be available
-     * to all other controllers that extend BaseController.
+     * Helpers à charger automatiquement.
      *
      * @var list<string>
      */
     protected $helpers = [];
 
     /**
-     * Be sure to declare properties for any property fetch you initialized.
-     * The creation of dynamic property is deprecated in PHP 8.2.
+     * Connexion DB accessible dans tous les controllers via $this->db
      */
-    // protected $session;
+    protected ConnectionInterface $db;
 
     /**
-     * @return void
+     * Constructor.
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
 
-        // Preload any models, libraries, etc, here.
+        // DB dispo partout (corrige "Undefined property ...::$db")
+        $this->db = Database::connect();
 
+        // Preload any models, libraries, etc, here.
         // E.g.: $this->session = service('session');
     }
 }

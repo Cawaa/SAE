@@ -32,25 +32,24 @@ class BeatFileModel extends Model
         return $row['path'] ?? null;
     }
 
+    /**
+     * IMPORTANT : désormais c'est un chemin PUBLIC relatif
+     * ex: uploads/previews/17/xxx.mp3
+     */
     public function getPreviewPath(int $beatId): ?string
     {
         return $this->getPathByType($beatId, 'preview_mp3');
     }
 
+    /**
+     * Chemin WRITABLE relatif
+     * ex: uploads/masters/17/xxx.wav
+     */
     public function getMasterPath(int $beatId): ?string
     {
-        $p = $this->getPathByType($beatId, 'master_wav');
-        if ($p !== null) {
-            return $p;
-        }
-
-        return $this->getPathByType($beatId, 'original_wav');
+        return $this->getPathByType($beatId, 'master_wav');
     }
 
-    /**
-     * Upsert basé sur la contrainte unique (beat_id, type)
-     * -> si existe, update ; sinon insert.
-     */
     public function upsertFile(
         int $beatId,
         string $type,

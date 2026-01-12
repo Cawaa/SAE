@@ -2,24 +2,30 @@
 
 namespace App\Controllers;
 
-use App\Models\HomeModel;
+use App\Strategies\BeatFeedService;
+use App\Strategies\LatestBeatsStrategy;
+use App\Strategies\CheapestBeatsStrategy;
 
 class HomeController extends BaseController
 {
     public function index(): string
     {
-        $homeModel = new HomeModel();
+        $sort = (string) ($this->request->getGet('sort') ?? 'latest');
 
-        $beats = $homeModel->getLatestBeats(6);
+        $service = new BeatFeedService($this->db);
 
-        $data = [
-            'title'      => 'Accueil',
-            'categories' => $homeModel->getTopCategories(8),
-            'beats'      => $beats,
-            'listings'   => $beats,
-            'stats'      => $homeModel->getStats(),
-        ];
+        $strategy = match ($sort) {
+            'cheap', 'cheapest', 'price' => new CheapestBeatsStrategy(),
+            default => new LatestBeatsStrategy(),
+        };
 
-        return view('home', $data);
+        // Home : tu avais 6 éléments, on garde 6
+        $beats = $service->getBeats($strategy, 6);
+
+        return view('home', [
+            'title' => 'Accueil',
+            'beats' => $beats,
+            'sort'  => $sort,
+        ]);
     }
 }

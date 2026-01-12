@@ -37,7 +37,7 @@ $routes->post('/register', 'AuthController::register');
 
 $routes->get('/logout', 'AuthController::logout');
 
-/*Page des artistes*/
+/* Page des artistes */
 $routes->get('/artists', 'ArtistController::index');
 
 /*
@@ -59,6 +59,10 @@ $routes->post('/beats/create', 'BeatController::create', ['filter' => 'auth']);
 // legacy create
 $routes->get('/listings/create', 'BeatController::createForm', ['filter' => 'auth']);
 $routes->post('/listings/create', 'BeatController::create', ['filter' => 'auth']);
+
+// ✅ preview audio (HTML5 <audio>)
+// IMPORTANT: avant /beats/(:num)
+$routes->get('/beats/(:num)/preview', 'BeatController::preview/$1');
 
 // show
 $routes->get('/beats/(:num)', 'BeatController::show/$1');
@@ -131,7 +135,6 @@ $routes->group('', ['filter' => 'auth'], static function (RouteCollection $route
 |--------------------------------------------------------------------------
 | Cart (public: invité + connecté)
 |--------------------------------------------------------------------------
-| (actuellement tu utilises connecté uniquement, mais routes OK)
 */
 $routes->get('/cart', 'CartController::show');
 $routes->get('/panier', 'CartController::show');

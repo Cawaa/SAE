@@ -82,30 +82,36 @@ class BeatModel extends Model
     }
 
     /**
-     * Recherche avancée (simple) — seulement si "do_search=1"
+     * Recherche avancée — titre OU artiste (+ tags/description)
+     * Filtres:
+     * - q, category_id, bpm_min, bpm_max, price_min, price_max, musical_key
      */
     public function search(array $filters): array
     {
-        $builder = $this->db->table('beats b');
-        $builder->select('b.*, c.name AS category_name, u.username AS seller_username');
-        $builder->join('categories c', 'c.id = b.category_id', 'left');
-        $builder->join('users u', 'u.id = b.user_id', 'left');
-        $builder->where('b.status', 'active');
-        $builder->where('b.buyer_id', null);
+        $builder = $this->db->table('beats b')
+            ->select('b.*, c.name AS category_name, u.username AS seller_username')
+            ->join('categories c', 'c.id = b.category_id', 'left')
+            ->join('users u', 'u.id = b.user_id', 'left')
+            ->where('b.status', 'active')
+            ->where('b.buyer_id', null);
 
-        if (!empty($filters['q'])) {
-            $q = trim((string)$filters['q']);
+        // q = recherche texte : titre OU artiste (+ tags/description)
+        $q = trim((string)($filters['q'] ?? ''));
+        if ($q !== '') {
             $builder->groupStart()
                 ->like('b.title', $q)
+                ->orLike('u.username', $q)
                 ->orLike('b.tags', $q)
                 ->orLike('b.description', $q)
             ->groupEnd();
         }
 
+        // category_id
         if (!empty($filters['category_id'])) {
             $builder->where('b.category_id', (int)$filters['category_id']);
         }
 
+        // bpm range
         if (!empty($filters['bpm_min'])) {
             $builder->where('b.bpm >=', (int)$filters['bpm_min']);
         }
@@ -113,10 +119,20 @@ class BeatModel extends Model
             $builder->where('b.bpm <=', (int)$filters['bpm_max']);
         }
 
+        // price range (ton controller les envoie, donc on les applique)
+        if ($filters['price_min'] !== null && $filters['price_min'] !== '') {
+            $builder->where('b.price >=', (float)$filters['price_min']);
+        }
+        if ($filters['price_max'] !== null && $filters['price_max'] !== '') {
+            $builder->where('b.price <=', (float)$filters['price_max']);
+        }
+
+        // musical key
         if (!empty($filters['musical_key'])) {
             $builder->where('b.musical_key', (string)$filters['musical_key']);
         }
 
+        // tri (comme ton feed)
         $builder->orderBy('b.is_featured', 'DESC');
         $builder->orderBy('b.created_at', 'DESC');
 

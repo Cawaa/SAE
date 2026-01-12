@@ -27,7 +27,7 @@ services:
         PMA_HOST: mysql
         PMA_USER: user
         PMA_PASSWORD: pass
-        UPLOAD_LIMIT: 20M
+        UPLOAD_LIMIT: 256M
       ports:
         - 8082:80
 

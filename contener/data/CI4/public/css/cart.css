@@ -1,0 +1,132 @@
+/* public/css/cart.css */
+.cart-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.cart-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+}
+
+@media (max-width: 850px) {
+    .cart-grid { grid-template-columns: 1fr; }
+}
+
+/* Liste des articles */
+.cart-items-list {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.cart-item:last-child { border-bottom: none; }
+
+.cart-item:hover { background: #fafafa; }
+
+.cart-item-info {
+    flex-grow: 1;
+}
+
+.cart-item-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.cart-item-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.cart-item-beatmaker {
+    color: #666;
+    font-weight: 500;
+}
+
+/* Actions et Total */
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.line-total {
+    font-size: 1.1rem;
+    font-weight: 800;
+    min-width: 100px;
+    text-align: right;
+}
+
+/* Résumé (Sidebar) */
+.cart-summary-card {
+    background: #eef5ff;
+    padding: 2rem   ;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    transition: 0.3s;
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.summary-total {
+    border-top: 1px solid #444;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+/* Boutons */
+.btn-checkout {
+    display: block;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.btn-checkout:hover { transform: translateY(-5px); }
+
+.btn-remove {
+    background: #ff4757;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #ffeaa7;
+    color: #d35400;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    margin-top: 8px;
+}

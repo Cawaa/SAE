@@ -1,13 +1,14 @@
 services:
   web:
     container_name: php
-    image: tempo-php:dev
+    build:
+      context: ./data/app_php
+      target: builder
     environment:
       - CI_ENVIRONMENT=development
     ports:
       - '8080:80'
       - '8081:81'
-    command: sh -lc "/usr/local/bin/init-ci4.sh && apache2-foreground"
   mysql:
     container_name: mysql8
     image: docker.io/mysql:8.0
@@ -30,4 +31,3 @@ services:
         UPLOAD_LIMIT: 256M
       ports:
         - 8082:80
-

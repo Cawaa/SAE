@@ -41,4 +41,8 @@ RUN a2dissite 000-default.conf && \
 # 5. Configuration PHP
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 
+# PHP limits
+COPY php-uploads.ini /usr/local/etc/php/conf.d/zz-php-uploads.ini
+
+
 CMD ["apache2-foreground"]

@@ -162,6 +162,9 @@ $routes->post('/cart/clear', 'CartController::clear');
 $routes->get('/cart/checkout', 'CartController::checkoutForm');
 $routes->post('/cart/checkout', 'CartController::checkout');
 
+// page merci après paiement (protégée)
+$routes->get('/checkout/thanks/(:num)', 'CartController::thanks/$1', ['filter' => 'auth']);
+
 $routes->group('admin', ['filter' => 'adminAuth'], static function ($routes) {
     $routes->get('/', 'AdminController::index');
     $routes->post('users/delete/(:num)', 'AdminController::deleteUser/$1');

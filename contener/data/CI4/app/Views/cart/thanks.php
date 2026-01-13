@@ -13,15 +13,23 @@
 <?php endif; ?>
 
 <?php
-$paidAt = $order['paid_at'] ?? null;
-$total  = ((int)($totalCents ?? 0)) / 100;
+$orderId    = (int)($order['id'] ?? 0);
+$paidAt     = (string)($order['paid_at'] ?? '');
+$totalCents = (int)($order['total_cents'] ?? 0);
+$total      = $totalCents / 100;
 ?>
 
 <p>Merci pour votre paiement !</p>
 
-<?php if (!empty($paidAt)) : ?>
+<?php if ($orderId > 0) : ?>
+    <p><small>Commande #<?= $orderId ?></small></p>
+<?php endif; ?>
+
+<?php if ($paidAt !== '') : ?>
     <p><small>Paiement enregistré le : <?= esc($paidAt) ?></small></p>
 <?php endif; ?>
+
+<hr>
 
 <h2>Résumé de votre commande</h2>
 
@@ -30,17 +38,28 @@ $total  = ((int)($totalCents ?? 0)) / 100;
 <?php else : ?>
     <ul>
         <?php foreach ($items as $it) : ?>
+            <?php
+            $beatId = (int)($it['beat_id'] ?? 0);
+            $label  = (string)($it['beat_title'] ?? '');
+            $pc     = (int)($it['price_cents'] ?? 0);
+            ?>
             <li>
-                <a href="<?= site_url('beats/' . (int)$it['beat_id']) ?>">
-                    <?= esc($it['beat_title'] ?? ('Beat #' . (int)$it['beat_id'])) ?>
-                </a>
-                — <?= number_format(((int)($it['price_cents'] ?? 0)) / 100, 2, '.', '') ?> €
+                <?php if ($beatId > 0) : ?>
+                    <a href="<?= site_url('beats/' . $beatId) ?>">
+                        <?= esc($label !== '' ? $label : ('Beat #' . $beatId)) ?>
+                    </a>
+                <?php else : ?>
+                    <?= esc($label !== '' ? $label : 'Beat') ?>
+                <?php endif; ?>
+                — <?= number_format($pc / 100, 2, ',', ' ') ?> €
             </li>
         <?php endforeach; ?>
     </ul>
 
-    <p><strong>Total : <?= number_format($total, 2, '.', '') ?> €</strong></p>
+    <p><strong>Total : <?= number_format($total, 2, ',', ' ') ?> €</strong></p>
 <?php endif; ?>
+
+<hr>
 
 <p>
     <a href="<?= site_url('/account/wallet') ?>">→ Aller dans mon Wallet (retélécharger mes achats)</a>

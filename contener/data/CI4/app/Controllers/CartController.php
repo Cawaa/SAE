@@ -15,25 +15,39 @@ class CartController extends BaseController
 
     public function show()
     {
-        [$cartId] = $this->getOrCreateCartId();
+        [$cartId, $isLoggedIn] = $this->getOrCreateCartId();
 
         $itemModel = new CartItemModel();
 
-        // Nettoyage des beats non achetables (sold/inactive)
-        $removed = $itemModel->removeSoldItems($cartId);
+        $itemModel->removeSoldItems($cartId);
 
-        $items = $itemModel->getDetailedItems($cartId);
+        $rows = $itemModel->getDetailedItems($cartId);
 
-        $totalCents = 0;
-        foreach ($items as $it) {
-            $totalCents += (int)($it['price_cents'] ?? 0);
+        $items = [];
+        $total = 0.0;
+        $hasUnavailable = false;
+
+        foreach ($rows as $r) {
+            $qty = (int)$r['quantite'];
+            $price = (float)$r['price'];
+            $line = $qty * $price;
+
+            $isAvailable = ($r['status'] === 'active' && empty($r['buyer_id']));
+            if (!$isAvailable) $hasUnavailable = true;
+
+            // total uniquement sur les beats achetables
+            if ($isAvailable) {
+                $total += $line;
+            }
+
+            $items[] = $r;
         }
 
         return view('cart/show', [
-            'title'   => 'Panier',
-            'items'   => $items,
-            'total'   => $totalCents / 100,
-            'removed' => $removed,
+            'items'          => $items,
+            'total'          => $total,
+            'hasUnavailable' => $hasUnavailable,
+            'isLoggedIn'     => $isLoggedIn,
         ]);
     }
 
@@ -41,14 +55,27 @@ class CartController extends BaseController
     {
         [$cartId] = $this->getOrCreateCartId();
 
-        $itemModel = new CartItemModel();
+        // Vérif disponibilité du beat
+        $beat = db_connect()->table('beats')
+            ->select('id, status, buyer_id')
+            ->where('id', $beatId)
+            ->get()->getRowArray();
 
-        try {
-            $itemModel->addBeat($cartId, $beatId);
-            return redirect()->back()->with('success', 'Ajouté au panier.');
-        } catch (\Throwable $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+        if (!$beat) {
+            return redirect()->to('/cart')->with('error', 'Beat introuvable.');
         }
+
+        $isAvailable = ($beat['status'] === 'active' && empty($beat['buyer_id']));
+        if (!$isAvailable) {
+            return redirect()->to('/cart')->with('error', 'Ce beat n’est plus disponible.');
+        }
+
+        $itemModel = new CartItemModel();
+        $itemModel->upsertIncrement($cartId, $beatId, 1);
+
+        db_connect()->table('carts')->where('id', $cartId)->update(['updated_at' => date('Y-m-d H:i:s')]);
+
+        return redirect()->to('/cart')->with('success', 'Ajouté au panier.');
     }
 
     public function remove(int $beatId)
@@ -56,43 +83,49 @@ class CartController extends BaseController
         [$cartId] = $this->getOrCreateCartId();
 
         $itemModel = new CartItemModel();
-        $itemModel->removeBeat($cartId, $beatId);
+        $itemModel->upsertIncrement($cartId, $beatId, -1);
 
-        return redirect()->to('/cart')->with('success', 'Retiré du panier.');
+        db_connect()->table('carts')->where('id', $cartId)->update(['updated_at' => date('Y-m-d H:i:s')]);
+
+        return redirect()->to('/cart');
     }
 
     public function removeLine(int $beatId)
     {
-        return $this->remove($beatId);
+        [$cartId] = $this->getOrCreateCartId();
+
+        $itemModel = new CartItemModel();
+        $itemModel->removeLine($cartId, $beatId);
+
+        db_connect()->table('carts')->where('id', $cartId)->update(['updated_at' => date('Y-m-d H:i:s')]);
+
+        return redirect()->to('/cart');
     }
 
     public function checkoutForm()
     {
-        $userId = (int)(session()->get('user_id') ?? 0);
         $isLoggedIn = (bool)session()->get('isLoggedIn');
-
-        if (!$isLoggedIn || $userId <= 0) {
+        if (!$isLoggedIn) {
             return redirect()->to('/login')->with('error', 'Connecte-toi pour finaliser l’achat.');
         }
 
         [$cartId] = $this->getOrCreateCartId();
 
         $itemModel = new CartItemModel();
-        $items = $itemModel->getDetailedItems($cartId);
+        $rows = $itemModel->getDetailedItems($cartId);
 
-        if (empty($items)) {
-            return redirect()->to('/cart')->with('error', 'Ton panier est vide.');
-        }
+        $total = 0.0;
+        $hasUnavailable = false;
 
-        $totalCents = 0;
-        foreach ($items as $it) {
-            $totalCents += (int)($it['price_cents'] ?? 0);
+        foreach ($rows as $r) {
+            $isAvailable = ($r['status'] === 'active' && empty($r['buyer_id']));
+            if (!$isAvailable) $hasUnavailable = true;
+            if ($isAvailable) $total += (float)$r['price'] * (int)$r['quantite'];
         }
 
         return view('cart/checkout', [
-            'title' => 'Paiement',
-            'items' => $items,
-            'total' => $totalCents / 100,
+            'total'          => $total,
+            'hasUnavailable' => $hasUnavailable,
         ]);
     }
 
@@ -112,39 +145,31 @@ class CartController extends BaseController
         $rows = $itemModel->getDetailedItems($cartId);
 
         if (empty($rows)) {
-            return redirect()->to('/cart')->with('error', 'Ton panier est vide.');
+            return redirect()->to('/cart')->with('error', 'Panier vide.');
+        }
+
+        // Vérif dispo
+        foreach ($rows as $r) {
+            $isAvailable = ($r['status'] === 'active' && empty($r['buyer_id']));
+            if (!$isAvailable) {
+                return redirect()->to('/cart')->with('error', 'Ton panier contient un beat indisponible. Retire-le avant de payer.');
+            }
         }
 
         $db->transBegin();
-
         try {
-            // recalcul total + vérifs stock
             $totalCents = 0;
             $orderItems = [];
 
             foreach ($rows as $r) {
-                $beatId = (int)$r['beat_id'];
-
-                $fresh = $db->table('beats')->select('id, user_id, title, status, buyer_id, price')
-                    ->where('id', $beatId)->get()->getRowArray();
-
-                if (!$fresh || ($fresh['status'] ?? '') !== 'active' || !empty($fresh['buyer_id'])) {
-                    throw new \RuntimeException('Un beat n’est plus disponible.');
-                }
-
-                $priceCents = (int)round(((float)$fresh['price']) * 100);
-                $totalCents += $priceCents;
-
-                $orderItems[] = [
-                    'beat_id'     => $beatId,
-                    'beat_title'  => (string)$fresh['title'],
-                    'price_cents' => $priceCents,
-                ];
+                $totalCents += (int)round(((float)$r['price']) * 100) * (int)$r['quantite'];
             }
 
             // Create order
             $db->table('orders')->insert([
                 'user_id'     => $userId,
+                'guest_email' => null,
+                'guest_token' => null,
                 'total_cents' => $totalCents,
                 'status'      => 'paid',
                 'created_at'  => date('Y-m-d H:i:s'),
@@ -153,44 +178,72 @@ class CartController extends BaseController
             $orderId = (int)$db->insertID();
 
             // Insert order_items + mark beats sold (1 vente unique)
-            foreach ($orderItems as $oi) {
+            foreach ($rows as $r) {
+                $beatId = (int)$r['beat_id'];
+
+                $fresh = $db->table('beats')->select('id, user_id, title, status, buyer_id, price')
+                    ->where('id', $beatId)->get()->getRowArray();
+
+                if (!$fresh || $fresh['status'] !== 'active' || !empty($fresh['buyer_id'])) {
+                    throw new \RuntimeException("Le beat #$beatId vient d’être vendu/retiré.");
+                }
+
+                $priceCents = (int)round(((float)$fresh['price']) * 100);
+
                 $db->table('order_items')->insert([
                     'order_id'    => $orderId,
-                    'beat_id'     => (int)$oi['beat_id'],
-                    'beat_title'  => (string)$oi['beat_title'],
-                    'price_cents' => (int)$oi['price_cents'],
+                    'beat_id'     => $beatId,
+                    'seller_id'   => (int)$fresh['user_id'],
+                    'beat_title'  => $fresh['title'],
+                    'price_cents' => $priceCents,
                     'created_at'  => date('Y-m-d H:i:s'),
                 ]);
+
+                // Ajouter aux infos de l'événement
+                $orderItems[] = [
+                    'beatId'      => $beatId,
+                    'sellerId'    => (int)$fresh['user_id'],
+                    'beat_title'  => $fresh['title'],
+                    'price_cents' => $priceCents,
+                ];
             }
 
-            // Observer pattern : achat terminé
-            $event = new AchatTermineEvent($orderId, $userId, $orderItems);
-
-            // Dispatcher + observers
-            $dispatcher = new EventDispatcher();
-            $dispatcher->attach(new InventoryManager());
-            $dispatcher->attach(new NotificationService());
-            $dispatcher->dispatch($event);
-
-            // clear cart
+            // Clear cart
             $itemModel->clearCart($cartId);
-
-            if ($db->transStatus() === false) {
-                throw new \RuntimeException('Transaction DB invalide.');
-            }
+            $db->table('carts')->where('id', $cartId)->update(['updated_at' => date('Y-m-d H:i:s')]);
 
             $db->transCommit();
 
-            return redirect()->to('/checkout/thanks/' . $orderId)->with('success', 'Achat effectué !');
+            // ===== PATTERN OBSERVER =====
+            // Créer l'événement d'achat terminé
+            $event = new AchatTermineEvent($orderId, $userId, $orderItems);
+
+            // Créer le dispatcher et enregistrer les observateurs
+            $dispatcher = new EventDispatcher();
+            $dispatcher->attach(new InventoryManager());
+            $dispatcher->attach(new NotificationService());
+
+            // Notifier tous les observateurs
+            $dispatcher->notify($event);
+            // ===== FIN PATTERN OBSERVER =====
+
         } catch (\Throwable $e) {
             $db->transRollback();
-            return redirect()->to('/cart')->with('error', 'Erreur achat : ' . $e->getMessage());
+            return redirect()->to('/cart')->with('error', 'Checkout impossible : ' . $e->getMessage());
         }
+
+        // ✅ Seule modif demandée : rediriger vers la page Merci (orderId)
+        return redirect()->to('/checkout/thanks/' . $orderId)->with('success', 'Achat effectué !');
     }
 
     /**
      * Page "Merci pour votre paiement"
      * GET /checkout/thanks/{orderId}
+     *
+     * - vérifie login
+     * - vérifie ownership (orders.user_id) + status paid
+     * - charge résumé (items, total, date)
+     * - renvoie la vue cart/thanks.php
      */
     public function thanks(int $orderId)
     {
@@ -203,7 +256,6 @@ class CartController extends BaseController
 
         $db = db_connect();
 
-        // Ownership + statut payé
         $order = $db->table('orders')
             ->where('id', $orderId)
             ->where('user_id', $userId)
@@ -215,7 +267,6 @@ class CartController extends BaseController
             return redirect()->to('/cart')->with('error', 'Commande introuvable ou accès refusé.');
         }
 
-        // Résumé des items achetés
         $items = $db->table('order_items oi')
             ->select('oi.beat_id, oi.beat_title, oi.price_cents')
             ->where('oi.order_id', $orderId)
@@ -223,13 +274,10 @@ class CartController extends BaseController
             ->get()
             ->getResultArray();
 
-        $totalCents = (int)($order['total_cents'] ?? 0);
-
         return view('cart/thanks', [
-            'title'      => 'Merci pour votre paiement',
-            'order'      => $order,
-            'items'      => $items,
-            'totalCents' => $totalCents,
+            'title' => 'Merci pour votre paiement',
+            'order' => $order,
+            'items' => $items,
         ]);
     }
 
@@ -238,66 +286,71 @@ class CartController extends BaseController
      */
     private function getOrCreateCartId(): array
     {
+        $session = session();
+        $isLoggedIn = (bool)$session->get('isLoggedIn');
+        $userId = (int)($session->get('user_id') ?? 0);
+
         $db = db_connect();
-        $isLoggedIn = (bool)session()->get('isLoggedIn');
-        $userId = (int)(session()->get('user_id') ?? 0);
+
+        // guest token cookie
+        $guestToken = (string)($this->request->getCookie(self::COOKIE_NAME) ?? '');
 
         if ($isLoggedIn && $userId > 0) {
-            // user cart
+            // cart user
             $userCart = $db->table('carts')->where('user_id', $userId)->get()->getRowArray();
 
             if (!$userCart) {
                 $db->table('carts')->insert([
-                    'user_id'    => $userId,
-                    'guest_token'=> null,
-                    'created_at' => date('Y-m-d H:i:s'),
+                    'user_id'     => $userId,
+                    'guest_token' => null,
+                    'created_at'  => date('Y-m-d H:i:s'),
+                    'updated_at'  => date('Y-m-d H:i:s'),
                 ]);
                 $userCart = $db->table('carts')->where('user_id', $userId)->get()->getRowArray();
             }
 
-            // if guest token exists, merge once
-            $guestToken = (string)($this->request->getCookie(self::COOKIE_NAME) ?? '');
-            if ($guestToken !== '') {
+            // merge guest cart dans user cart
+            if (!empty($guestToken)) {
                 $guestCart = $db->table('carts')->where('guest_token', $guestToken)->get()->getRowArray();
                 if ($guestCart && (int)$guestCart['id'] !== (int)$userCart['id']) {
-                    $db->table('cart_items')
-                        ->where('cart_id', (int)$guestCart['id'])
-                        ->update(['cart_id' => (int)$userCart['id']]);
+                    $itemModel = new CartItemModel();
+                    $guestItems = $itemModel->where('cart_id', (int)$guestCart['id'])->findAll();
+
+                    foreach ($guestItems as $gi) {
+                        $itemModel->upsertIncrement((int)$userCart['id'], (int)$gi['beat_id'], (int)$gi['quantite']);
+                    }
 
                     // delete guest cart + items
-                    $itemModel = new CartItemModel();
                     $itemModel->clearCart((int)$guestCart['id']);
                     $db->table('carts')->where('id', (int)$guestCart['id'])->delete();
                 }
-
-                // remove cookie
-                $this->response->setCookie(self::COOKIE_NAME, '', 1);
             }
 
             return [(int)$userCart['id'], true];
         }
 
         // Guest flow
-        $guestToken = (string)($this->request->getCookie(self::COOKIE_NAME) ?? '');
-        if ($guestToken === '') {
+        if (empty($guestToken)) {
             $guestToken = bin2hex(random_bytes(16));
             $this->response->setCookie([
-                'name'     => self::COOKIE_NAME,
-                'value'    => $guestToken,
-                'expire'   => time() + (self::COOKIE_DAYS * 86400),
-                'path'     => '/',
-                'secure'   => false,
+                'name'   => self::COOKIE_NAME,
+                'value'  => $guestToken,
+                'expire' => self::COOKIE_DAYS * 24 * 60 * 60,
+                'path'   => '/',
+                'secure' => false,
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);
         }
 
         $guestCart = $db->table('carts')->where('guest_token', $guestToken)->get()->getRowArray();
+
         if (!$guestCart) {
             $db->table('carts')->insert([
                 'user_id'     => null,
                 'guest_token' => $guestToken,
                 'created_at'  => date('Y-m-d H:i:s'),
+                'updated_at'  => date('Y-m-d H:i:s'),
             ]);
             $guestCart = $db->table('carts')->where('guest_token', $guestToken)->get()->getRowArray();
         }

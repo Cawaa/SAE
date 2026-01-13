@@ -3,8 +3,8 @@
    ============================================ */
 
 :root {
-    --primary-blue: #2563eb;
-    --primary-blue-light: #3b82f6;
+    --primary-blue: #3b82f6;
+    --primary-blue-dark: #2563eb;
     --secondary-blue: #1e40af;
     --bg-white: #ffffff;
     --bg-light-gray: #f8fafc;
@@ -43,7 +43,7 @@ body {
    ============================================ */
 
 h1 {
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     font-weight: 800;
     margin-bottom: 30px;
     margin-top: 20px;
@@ -58,7 +58,7 @@ h2 {
     margin-top: 30px;
     margin-bottom: 20px;
     font-size: 1.5rem;
-    border-bottom: 2px solid var(--primary-blue-light);
+    border-bottom: 2px solid var(--primary-blue);
     padding-bottom: 10px;
 }
 
@@ -93,7 +93,7 @@ hr {
    ============================================ */
 
 a {
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     text-decoration: none;
     transition: all 0.2s ease;
     font-weight: 500;
@@ -108,7 +108,7 @@ a:hover {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     margin-top: 30px;
     padding: 10px 15px;
     border-radius: 8px;
@@ -160,7 +160,7 @@ a:hover {
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-    border-color: var(--primary-blue);
+    border-color: var(--primary-blue-dark);
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
     outline: none;
 }
@@ -182,7 +182,7 @@ a:hover {
 button,
 .btn {
     padding: 12px 24px;
-    background: var(--primary-blue);
+    background: var(--primary-blue-dark);
     color: white;
     border: none;
     border-radius: 8px;
@@ -254,7 +254,7 @@ li {
 }
 
 li a {
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     font-weight: 500;
 }
 
@@ -288,14 +288,14 @@ small {
 }
 
 .stat-card:hover {
-    border-color: var(--primary-blue);
+    border-color: var(--primary-blue-dark);
     box-shadow: var(--shadow-hover);
     transform: translateY(-3px);
 }
 
 .stat-card strong {
     font-size: 1.8rem;
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     display: block;
     margin-bottom: 10px;
 }
@@ -319,7 +319,7 @@ small {
 
 .favorite-item {
     background: var(--bg-white);
-    border-left: 4px solid var(--primary-blue);
+    border-left: 4px solid var(--primary-blue-dark);
     padding: 15px;
     margin-bottom: 12px;
     border-radius: 8px;
@@ -342,7 +342,7 @@ small {
 
 .favorite-price {
     background: #eff6ff;
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     padding: 6px 12px;
     border-radius: 20px;
     font-weight: 700;
@@ -363,7 +363,7 @@ small {
 
 .conversation-item {
     background: var(--bg-white);
-    border-left: 4px solid var(--primary-blue);
+    border-left: 4px solid var(--primary-blue-dark);
     padding: 15px;
     margin-bottom: 12px;
     border-radius: 8px;
@@ -377,7 +377,7 @@ small {
 
 .conversation-title {
     font-weight: 600;
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     margin-bottom: 8px;
 }
 
@@ -393,7 +393,7 @@ small {
    ============================================ */
 
 .profile-header {
-    background: linear-gradient(135deg, var(--primary-blue-light) 0%, var(--primary-blue) 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
     color: white;
     padding: 40px;
     border-radius: 12px;
@@ -472,7 +472,7 @@ small {
 
 .message-info {
     background: #eff6ff;
-    border-left: 4px solid var(--primary-blue);
+    border-left: 4px solid var(--primary-blue-dark);
     color: #0c4a6e;
     padding: 15px;
     border-radius: 8px;

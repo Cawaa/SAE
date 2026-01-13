@@ -1,10 +1,10 @@
 /* CI4/public/css/artists.css */
 
 :root {
-    --primary-blue: #2F6BFF; /* Bleu "Home" */
-    --card-bg: #eef5ff;      /* Fond des cartes "Home" */
-    --text-main: #111827;    /* Noir profond */
-    --text-sub: #6b7280;     /* Gris texte */
+    --primary-blue-dark: #2563eb;
+    --card-bg: #eef5ff;
+    --text-main: #111827;
+    --text-sub: #6b7280;
     --border-color: #d1e3ff;
 }
 
@@ -38,7 +38,7 @@ h2::after {
     transform: translateX(-50%);
     width: 70%;
     height: 3px;
-    background-color: var(--primary-blue);
+    background-color: var(--primary-blue-dark);
     border-radius: 2px;
 }
 
@@ -58,7 +58,7 @@ h2::after {
     overflow-x: auto;
     padding: 20px 10px;
     scrollbar-width: thin;
-    scrollbar-color: var(--primary-blue) #f0f0f0;
+    scrollbar-color: var(--primary-blue-dark) #f0f0f0;
     /* Centrer si peu d'éléments, sinon début */
     justify-content: flex-start; 
     margin-left:10% ;
@@ -83,7 +83,7 @@ h2::after {
 .artist-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(47, 107, 255, 0.1);
-    border-color: var(--primary-blue);
+    border-color: var(--primary-blue-dark);
     background: white; /* Éclaircir la carte au survol */
 }
 
@@ -100,7 +100,7 @@ h2::after {
 
 .artist-card:hover .artist-avatar img {
     transform: scale(1.05);
-    border-color: var(--primary-blue);
+    border-color: var(--primary-blue-dark);
 }
 
 .artist-name {
@@ -121,7 +121,7 @@ h2::after {
 
 .artist-stats {
     background: white;
-    color: var(--primary-blue);
+    color: var(--primary-blue-dark);
     padding: 6px 16px;
     border-radius: 50px;
     font-size: 0.85rem;
@@ -153,8 +153,8 @@ h2::after {
 }
 
 .beat-chip:hover {
-    background: var(--primary-blue);
+    background: var(--primary-blue-dark);
     color: white;
-    border-color: var(--primary-blue);
+    border-color: var(--primary-blue-dark);
     transform: translateY(-2px);
 }

@@ -6,6 +6,8 @@ use App\Models\BeatModel;
 use App\Models\BeatFileModel;
 use App\Models\CategoryModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
+use App\Decorators\BaseBeat;
+use App\Decorators\PromoDecorator;
 
 class BeatController extends BaseController
 {
@@ -14,11 +16,12 @@ class BeatController extends BaseController
         $beatModel = new BeatModel();
         $catModel  = new CategoryModel();
 
-        $beats = $beatModel->getDefaultFeed(24);
+        $rawBeats = $beatModel->getDefaultFeed(24);
+        $decoratedBeats = $this->decorateBeats($rawBeats); // Transformation ici
 
         return view('beats/index', [
             'title'      => 'Boutique',
-            'beats'      => $beats,
+            'beats'      => $decoratedBeats,
             'categories' => $catModel->orderBy('name', 'ASC')->findAll(),
             'filters'    => [],
             'doSearch'   => false,
@@ -41,15 +44,35 @@ class BeatController extends BaseController
         $beatModel = new BeatModel();
         $catModel  = new CategoryModel();
 
-        $beats = $beatModel->search($filters);
+        $rawBeats = $beatModel->search($filters);
+        $decoratedBeats = $this->decorateBeats($rawBeats); // Transformation ici
 
         return view('beats/index', [
             'title'      => 'Recherche',
-            'beats'      => $beats,
+            'beats'      => $decoratedBeats,
             'categories' => $catModel->orderBy('name', 'ASC')->findAll(),
             'filters'    => $filters,
             'doSearch'   => true,
         ]);
+    }
+    /**
+     * Helper interne pour appliquer les décorateurs
+     */
+    private function decorateBeats(array $beats): array
+    {
+        $result = [];
+        foreach ($beats as $data) {
+            $beat = new BaseBeat($data);
+
+            // Exemple : si le prix est > 50€, on pourrait imaginer une promo auto
+            // Ou utiliser un champ 'is_promo' si vous l'ajoutez en base de données
+            if ($beat->getPrice() > 50) {
+                $beat = new PromoDecorator($beat);
+            }
+
+            $result[] = $beat;
+        }
+        return $result;
     }
 
     public function show(int $id)

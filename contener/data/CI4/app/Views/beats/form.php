@@ -17,6 +17,10 @@ $isEdit = !empty($beat['id']);
 $action = $isEdit
     ? base_url('/beats/' . (int)$beat['id'] . '/edit')
     : base_url('/beats/create');
+
+$backUrl = $isEdit
+    ? base_url('/my/beats')
+    : base_url('/beats');
 ?>
 
 <form method="POST" action="<?= esc($action) ?>" enctype="multipart/form-data">
@@ -69,6 +73,6 @@ $action = $isEdit
     <button type="submit"><?= $isEdit ? 'Enregistrer' : 'Créer' ?></button>
 </form>
 
-<p><a href="<?= base_url('/beats') ?>">← Retour</a></p>
+<p><a href="<?= esc($backUrl) ?>">← Retour</a></p>
 
 <?= $this->endSection() ?>

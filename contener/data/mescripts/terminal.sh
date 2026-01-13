@@ -1,1 +1,0 @@
-MSYS_NO_PATHCONV=1 podman exec -it php /bin/bash

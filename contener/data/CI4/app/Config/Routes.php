@@ -64,6 +64,21 @@ $routes->post('/listings/create', 'BeatController::create', ['filter' => 'auth']
 // IMPORTANT: avant /beats/(:num)
 $routes->get('/beats/(:num)/preview', 'BeatController::preview/$1');
 
+/*
+|--------------------------------------------------------------------------
+| Beat edition (seller only)
+|--------------------------------------------------------------------------
+*/
+
+// Formulaire de modification d’un beat
+$routes->get('/beats/(:num)/edit', 'BeatController::editForm/$1', ['filter' => 'auth']);
+
+// Traitement de la modification
+$routes->post('/beats/(:num)/edit', 'BeatController::update/$1', ['filter' => 'auth']);
+
+// Suppression d’un beat (depuis "Mon compte")
+$routes->post('/beats/(:num)/delete', 'BeatController::delete/$1', ['filter' => 'auth']);
+
 // show
 $routes->get('/beats/(:num)', 'BeatController::show/$1');
 $routes->get('/listings/(:num)', 'BeatController::show/$1'); // legacy

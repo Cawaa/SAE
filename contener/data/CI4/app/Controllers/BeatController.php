@@ -214,6 +214,214 @@ class BeatController extends BaseController
         }
     }
 
+    /**
+     * GET /beats/{id}/edit
+     * Affiche le formulaire d'édition (propriétaire uniquement, non vendu).
+     */
+    public function editForm(int $id)
+    {
+        $userId = (int) (session()->get('user_id') ?? 0);
+        if ($userId <= 0) {
+            return redirect()->to('/login');
+        }
+
+        $beatModel = new BeatModel();
+        $beat      = $beatModel->find($id);
+
+        if (!$beat) {
+            throw new PageNotFoundException('Beat introuvable.');
+        }
+
+        // Ownership
+        if ((int)($beat['user_id'] ?? 0) !== $userId) {
+            return redirect()->to('/my/beats')->with('error', 'Accès refusé : vous ne pouvez modifier que vos beats.');
+        }
+
+        // Refuser édition si vendu / non actif
+        $isSold = !empty($beat['buyer_id']);
+        $isActive = (($beat['status'] ?? '') === 'active');
+
+        if ($isSold || !$isActive) {
+            return redirect()->to('/my/beats')->with('error', 'Beat vendu, modification impossible.');
+        }
+
+        $catModel = new CategoryModel();
+
+        return view('beats/form', [
+            'title'      => 'Modifier un beat',
+            'categories' => $catModel->orderBy('name', 'ASC')->findAll(),
+            'beat'       => $beat,
+        ]);
+    }
+
+    /**
+     * POST /beats/{id}/edit
+     * Traite la mise à jour (propriétaire uniquement, fichiers optionnels).
+     */
+    public function update(int $id)
+    {
+        $userId = (int) (session()->get('user_id') ?? 0);
+        if ($userId <= 0) {
+            return redirect()->to('/login');
+        }
+
+        $beatModel = new BeatModel();
+        $fileModel = new BeatFileModel();
+
+        $beat = $beatModel->find($id);
+        if (!$beat) {
+            throw new PageNotFoundException('Beat introuvable.');
+        }
+
+        // Ownership
+        if ((int)($beat['user_id'] ?? 0) !== $userId) {
+            return redirect()->to('/my/beats')->with('error', 'Accès refusé : vous ne pouvez modifier que vos beats.');
+        }
+
+        // Refuser édition si vendu / non actif
+        $isSold = !empty($beat['buyer_id']);
+        $isActive = (($beat['status'] ?? '') === 'active');
+
+        if ($isSold || !$isActive) {
+            return redirect()->to('/my/beats')->with('error', 'Beat vendu, modification impossible.');
+        }
+
+        $title = trim((string) ($this->request->getPost('title') ?? ''));
+        if ($title === '') {
+            return redirect()->back()->withInput()->with('error', 'Titre obligatoire.');
+        }
+
+        $updateData = [
+            'category_id' => (int)($this->request->getPost('category_id') ?? 0) ?: null,
+            'bpm'         => $this->request->getPost('bpm') !== null ? (int)$this->request->getPost('bpm') : null,
+            'musical_key' => trim((string)($this->request->getPost('musical_key') ?? '')) ?: null,
+            'tags'        => trim((string)($this->request->getPost('tags') ?? '')) ?: null,
+            'title'       => $title,
+            'description' => trim((string)($this->request->getPost('description') ?? '')) ?: null,
+            'price'       => (float)($this->request->getPost('price') ?? 0),
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ];
+
+        $previewFile = $this->request->getFile('preview_file');
+        $masterFile  = $this->request->getFile('original_file');
+
+        // Pour rollback si erreur
+        $createdAbs = [];
+        // Pour suppression après commit (évite perdre l’ancien si rollback)
+        $deleteAfterCommitAbs = [];
+
+        $db = db_connect();
+        $db->transBegin();
+
+        try {
+            // 1) Update DB beat
+            if ($beatModel->update($id, $updateData) === false) {
+                throw new \RuntimeException('Échec mise à jour beat.');
+            }
+
+            // 2) Preview optionnelle (PUBLIC)
+            if ($previewFile && $previewFile->isValid() && !$previewFile->hasMoved() && $previewFile->getSize() > 0) {
+                $oldRel = $fileModel->getPreviewPath($id);
+
+                $previewSize = (int) $previewFile->getSize();
+                $previewMime = (string) $previewFile->getMimeType();
+
+                $this->assertUploadValidValues($previewSize, $previewMime, ['audio/mpeg', 'audio/mp3'], 15 * 1024 * 1024, 'preview MP3');
+
+                $previewInfo = $this->saveUploadToPublicFile(
+                    $id,
+                    $previewFile,
+                    'uploads/previews',
+                    $previewMime,
+                    $previewSize,
+                    $createdAbs
+                );
+
+                $fileModel->upsertFile(
+                    $id,
+                    'preview_mp3',
+                    $previewInfo['relativePath'],
+                    $previewInfo['mime'],
+                    $previewInfo['sizeBytes'],
+                    $previewInfo['sha256']
+                );
+
+                // Nettoyage ancien fichier (après commit)
+                if ($oldRel) {
+                    $oldRel = str_replace(['..', '\\'], ['', '/'], (string)$oldRel);
+                    $oldAbs = rtrim(\FCPATH, '/\\') . '/' . ltrim($oldRel, '/');
+                    if (is_file($oldAbs)) {
+                        $deleteAfterCommitAbs[] = $oldAbs;
+                    }
+                }
+            }
+
+            // 3) Master optionnel (WRITABLE)
+            if ($masterFile && $masterFile->isValid() && !$masterFile->hasMoved() && $masterFile->getSize() > 0) {
+                $oldRel = $fileModel->getMasterPath($id);
+
+                $masterSize = (int) $masterFile->getSize();
+                $masterMime = (string) $masterFile->getMimeType();
+
+                $this->assertUploadValidValues($masterSize, $masterMime, ['audio/wav', 'audio/x-wav'], 80 * 1024 * 1024, 'master WAV');
+
+                $masterInfo = $this->saveUploadToWritableFile(
+                    $id,
+                    $masterFile,
+                    'uploads/masters',
+                    $masterMime,
+                    $masterSize,
+                    $createdAbs
+                );
+
+                $fileModel->upsertFile(
+                    $id,
+                    'master_wav',
+                    $masterInfo['relativePath'],
+                    $masterInfo['mime'],
+                    $masterInfo['sizeBytes'],
+                    $masterInfo['sha256']
+                );
+
+                // Nettoyage ancien fichier (après commit)
+                if ($oldRel) {
+                    $oldRel = str_replace(['..', '\\'], ['', '/'], (string)$oldRel);
+                    $oldAbs = rtrim(\WRITEPATH, '/\\') . '/' . ltrim($oldRel, '/');
+                    if (is_file($oldAbs)) {
+                        $deleteAfterCommitAbs[] = $oldAbs;
+                    }
+                }
+            }
+
+            if ($db->transStatus() === false) {
+                throw new \RuntimeException('Transaction DB invalide.');
+            }
+
+            $db->transCommit();
+
+            // Suppression des anciens fichiers si remplacement (après commit)
+            foreach ($deleteAfterCommitAbs as $p) {
+                if (is_file($p)) {
+                    @unlink($p);
+                }
+            }
+
+            return redirect()->to('/my/beats')->with('success', 'Beat modifié.');
+
+        } catch (\Throwable $e) {
+            $db->transRollback();
+
+            // Nettoyage des nouveaux fichiers si rollback
+            foreach ($createdAbs as $p) {
+                if (is_file($p)) {
+                    @unlink($p);
+                }
+            }
+
+            return redirect()->back()->withInput()->with('error', 'Erreur mise à jour : ' . $e->getMessage());
+        }
+    }
+
     public function myBeats()
     {
         $userId = (int) (session()->get('user_id') ?? 0);

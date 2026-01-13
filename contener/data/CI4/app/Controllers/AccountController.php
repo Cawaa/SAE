@@ -95,7 +95,6 @@ class AccountController extends BaseController
         ];
 
         // Avatar (optionnel)
-        // Recommandation: stocker dans PUBLIC pour affichage direct: public/images/avatars
         // En DB: 'avatars/<filename>'
         $file = $this->request->getFile('avatar');
         if ($file && $file->isValid() && !$file->hasMoved() && $file->getSize() > 0) {
@@ -103,7 +102,6 @@ class AccountController extends BaseController
             $mime = (string) $file->getMimeType();
             $size = (int) $file->getSize();
 
-            // Restrictions simples (pro)
             if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) {
                 return redirect()->to('/account/profile')->with('error', 'Avatar invalide (jpg/png/webp/gif).');
             }
@@ -146,7 +144,6 @@ class AccountController extends BaseController
         $userId = $this->requireLogin();
         if (!is_int($userId)) return $userId;
 
-        // FavoriteModel n’a pas de méthode "list", donc on fait une requête join propre ici
         $db = db_connect();
         $favorites = $db->table('favorites f')
             ->select('b.id, b.title, b.price, b.bpm, b.musical_key, b.status, b.buyer_id, f.created_at')
@@ -189,7 +186,7 @@ class AccountController extends BaseController
 
     public function beatCreate()
     {
-        return redirect()->to('/beats/create'); // le POST est géré par BeatController::create
+        return redirect()->to('/beats/create');
     }
 
     public function beatEditForm($id)
@@ -215,9 +212,22 @@ class AccountController extends BaseController
         $walletModel = new WalletModel();
         $wallet = $walletModel->where('user_id', $userId)->first();
 
+        // Liste des achats: plus récent -> plus ancien
+        $db = db_connect();
+        $purchases = $db->table('orders o')
+            ->select('o.id AS order_id, o.paid_at, o.total_cents, oi.beat_id, oi.beat_title, oi.price_cents')
+            ->join('order_items oi', 'oi.order_id = o.id')
+            ->where('o.user_id', $userId)
+            ->where('o.status', 'paid')
+            ->orderBy('o.paid_at', 'DESC')
+            ->orderBy('oi.id', 'DESC')
+            ->get()
+            ->getResultArray();
+
         return view('account/wallet', [
-            'title' => 'Wallet',
-            'wallet' => $wallet,
+            'title'     => 'Wallet',
+            'wallet'    => $wallet,
+            'purchases' => $purchases,
         ]);
     }
 
@@ -273,6 +283,10 @@ class AccountController extends BaseController
                 ->with('success', "Abonnement prolongé (+30 jours).");
         }
 
+        // Sinon on crée un abonnement actif
+        // Sinon on crée un abonnement actif
+        // Sinon on crée un abonnement actif
+        // Sinon on crée un abonnement actif
         // Sinon on crée un abonnement actif
         $subModel->insert([
             'user_id' => $userId,

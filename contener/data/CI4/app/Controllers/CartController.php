@@ -312,4 +312,13 @@ class CartController extends BaseController
 
         return [(int)$guestCart['id'], false];
     }
+
+    public function clear()
+    {
+        [$cartId] = $this->getOrCreateCartId();
+        $itemModel = new \App\Models\CartItemModel();
+        $itemModel->clearCart($cartId);
+
+        return redirect()->to('/cart')->with('success', 'Le panier a été vidé.');
+    }
 }

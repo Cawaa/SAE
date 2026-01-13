@@ -60,7 +60,7 @@ $routes->post('/beats/create', 'BeatController::create', ['filter' => 'auth']);
 $routes->get('/listings/create', 'BeatController::createForm', ['filter' => 'auth']);
 $routes->post('/listings/create', 'BeatController::create', ['filter' => 'auth']);
 
-// ✅ preview audio (HTML5 <audio>)
+// preview audio (HTML5 <audio>)
 // IMPORTANT: avant /beats/(:num)
 $routes->get('/beats/(:num)/preview', 'BeatController::preview/$1');
 
@@ -142,6 +142,7 @@ $routes->get('/panier', 'CartController::show');
 $routes->post('/cart/add/(:num)', 'CartController::add/$1');
 $routes->post('/cart/remove/(:num)', 'CartController::remove/$1');
 $routes->post('/cart/remove-line/(:num)', 'CartController::removeLine/$1');
+$routes->post('/cart/clear', 'CartController::clear');
 
 $routes->get('/cart/checkout', 'CartController::checkoutForm');
 $routes->post('/cart/checkout', 'CartController::checkout');

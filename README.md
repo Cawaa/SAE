@@ -3,6 +3,28 @@
 
 Si c'est le cas faire `git rm -r --cached data/CI4/vendor`
 
+## Lancer le projet Rapidement:
+
+```bash
+cd eq_1_04_bracq-noe_devillers-tino_dufresne-elric_martin-sacha\contener
+
+./setup.sh
+```
+
+Si erreur lors du ./setup.sh augmenter le temps d'attente dans le scripte ./setup.sh
+
+Si il y a une erreur d'image : rebuild l'image : 
+```bash
+podman compose build --no-cache web
+```
+
+### après modifications du code dans contener/data/CI4/app :
+
+```bash
+./script/push.sh
+```
+
+
 ## Pour lancer le projet :
 1. Si ce n'est pas fait copier coller le fichier `env` et le renommer `.env` dans data/CI4 et décommentez les lignes comme suivant (si cela n'est pas fait) : 
 

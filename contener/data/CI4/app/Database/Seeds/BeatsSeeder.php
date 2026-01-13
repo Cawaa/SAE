@@ -42,7 +42,7 @@ class BeatsSeeder extends Seeder
                 'updated_at'   => $now,
             ],
             [
-                'user_id'      => 2,
+                'user_id'      => 4,
                 'category_id'  => $defaultCategoryId,
                 'bpm'          => 95,
                 'musical_key'  => 'C#m',
@@ -203,7 +203,7 @@ class BeatsSeeder extends Seeder
 
             // Pop
             [
-                'user_id'      => 2,
+                'user_id'      => 4,
                 'category_id'  => $defaultCategoryId,
                 'bpm'          => 128,
                 'musical_key'  => 'Emaj',
@@ -214,14 +214,14 @@ class BeatsSeeder extends Seeder
                 'status'       => 'active',
                 'buyer_id'     => null,
                 'sold_at'      => null,
-                'is_featured'  => 0,
+                'is_featured'  => 1,
                 'created_at'   => $now,
                 'updated_at'   => $now,
             ],
 
             // Grime
             [
-                'user_id'      => 3,
+                'user_id'      => 4,
                 'category_id'  => $defaultCategoryId,
                 'bpm'          => 140,
                 'musical_key'  => 'Fm',
@@ -239,7 +239,7 @@ class BeatsSeeder extends Seeder
 
             // Trap mélodique
             [
-                'user_id'      => 2,
+                'user_id'      => 5,
                 'category_id'  => $defaultCategoryId,
                 'bpm'          => 135,
                 'musical_key'  => 'Bm',
@@ -257,7 +257,7 @@ class BeatsSeeder extends Seeder
 
             // Old school 90s
             [
-                'user_id'      => 3,
+                'user_id'      => 5,
                 'category_id'  => $defaultCategoryId,
                 'bpm'          => 95,
                 'musical_key'  => 'Gm',
@@ -265,10 +265,10 @@ class BeatsSeeder extends Seeder
                 'title'        => 'Queensbridge',
                 'description'  => 'Hommage au son New-Yorkais des années 90.',
                 'price'        => 42.00,
-                'status'       => 'active',
+                'status'       => 'sold',
                 'buyer_id'     => null,
                 'sold_at'      => null,
-                'is_featured'  => 0,
+                'is_featured'  => 1,
                 'created_at'   => $now,
                 'updated_at'   => $now,
             ],

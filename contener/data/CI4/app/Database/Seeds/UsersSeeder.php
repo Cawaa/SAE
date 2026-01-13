@@ -25,7 +25,7 @@ class UsersSeeder extends Seeder
                 'username' => 'buyer',
                 'password_hash' => password_hash('buyer0', PASSWORD_DEFAULT),
                 'role' => 'user',
-                'avatar' => null,
+                'avatar' => 'buyer.jpg',
                 'artist_genre' => null,
                 'created_at' => $now,
             ],

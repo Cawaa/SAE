@@ -25,6 +25,8 @@ podman exec php /bin/bash -c "
     composer install && \
     mkdir -p writable/cache writable/debugbar writable/logs writable/session writable/uploads && \
     chmod -R 777 writable && \
+    mkdir -p public/images/avatars && \
+    chmod -R 777 public/images/avatars && \
     if [ -f env ]; then mv env .env; fi && \
     php spark migrate && \
     php spark db:seed DatabaseSeeder

@@ -9,7 +9,6 @@ use App\Models\SubscriptionModel;
 use App\Models\WalletModel;
 use CodeIgniter\I18n\Time;
 
-
 class AccountController extends BaseController
 {
     private function requireLogin()
@@ -51,11 +50,11 @@ class AccountController extends BaseController
             'title' => 'Mon compte',
             'user'  => $user,
             'stats' => [
-                'beats_total'        => $beatsTotal,
-                'beats_active'       => $beatsActive,
-                'beats_sold'         => $beatsSold,
-                'favorites_count'    => $favoritesCount,
-                'conversations_count'=> $conversationsCount,
+                'beats_total'         => $beatsTotal,
+                'beats_active'        => $beatsActive,
+                'beats_sold'          => $beatsSold,
+                'favorites_count'     => $favoritesCount,
+                'conversations_count' => $conversationsCount,
             ],
             'wallet' => $wallet,
             'subscription' => $subscription,
@@ -96,17 +95,45 @@ class AccountController extends BaseController
         ];
 
         // Avatar (optionnel)
+        // Recommandation: stocker dans PUBLIC pour affichage direct: public/images/avatars
+        // En DB: 'avatars/<filename>'
         $file = $this->request->getFile('avatar');
-        if ($file && $file->isValid() && !$file->hasMoved()) {
+        if ($file && $file->isValid() && !$file->hasMoved() && $file->getSize() > 0) {
+
             $mime = (string) $file->getMimeType();
-            if (!str_starts_with($mime, 'image/')) {
-                return redirect()->to('/account/profile')->with('error', 'Avatar invalide (image requise).');
+            $size = (int) $file->getSize();
+
+            // Restrictions simples (pro)
+            if (!in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) {
+                return redirect()->to('/account/profile')->with('error', 'Avatar invalide (jpg/png/webp/gif).');
+            }
+            if ($size > 5 * 1024 * 1024) {
+                return redirect()->to('/account/profile')->with('error', 'Avatar trop volumineux (max 5MB).');
+            }
+
+            $avatarDir = rtrim(\FCPATH, '/\\') . '/images/avatars';
+            if (!is_dir($avatarDir)) {
+                @mkdir($avatarDir, 0775, true);
+            }
+
+            if (!is_dir($avatarDir) || !is_writable($avatarDir)) {
+                return redirect()->to('/account/profile')->with('error', 'Dossier avatar non accessible (permissions serveur).');
             }
 
             $newName = $file->getRandomName();
-            $file->move(WRITEPATH . 'uploads/avatars', $newName);
+            $file->move($avatarDir, $newName, true);
 
-            $data['avatar'] = 'writable/uploads/avatars/' . $newName;
+            // Supprimer l'ancien avatar si c'est un fichier uploadé (avatars/*)
+            $old = (string)($user['avatar'] ?? '');
+            if ($old !== '' && str_starts_with($old, 'avatars/')) {
+                $old = str_replace(['..', '\\'], ['', '/'], $old);
+                $oldAbs = rtrim(\FCPATH, '/\\') . '/images/' . ltrim($old, '/');
+                if (is_file($oldAbs)) {
+                    @unlink($oldAbs);
+                }
+            }
+
+            $data['avatar'] = 'avatars/' . $newName;
         }
 
         $userModel->update($userId, $data);
@@ -150,7 +177,6 @@ class AccountController extends BaseController
         ]);
     }
 
-    
     public function beatsIndex()
     {
         return redirect()->to('/my/beats');
@@ -203,7 +229,6 @@ class AccountController extends BaseController
         $subModel = new SubscriptionModel();
         $subscription = $subModel->getAnyActive($userId);
 
-
         return view('account/subscription', [
             'title' => 'Abonnement',
             'subscription' => $subscription,
@@ -217,6 +242,7 @@ class AccountController extends BaseController
             'title' => 'Modération',
         ]);
     }
+
     public function buySubscription()
     {
         $userId = $this->requireLogin();
@@ -233,7 +259,7 @@ class AccountController extends BaseController
         $now = Time::now();
         $end = $now->addDays(30);
 
-        // Si déjà actif de ce type, on prolonge 
+        // Si déjà actif de ce type, on prolonge
         $existing = $subModel->getActive($userId, $type);
         if ($existing) {
             $currentEnd = !empty($existing['ends_at']) ? Time::parse($existing['ends_at']) : $now;
@@ -263,5 +289,4 @@ class AccountController extends BaseController
         return redirect()->to('/account/subscription')
             ->with('success', "Abonnement activé (simulation, 30 jours).");
     }
-
 }

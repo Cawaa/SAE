@@ -79,24 +79,21 @@
 <?php else : ?>
     <div class="beats-grid">
         <?php foreach ($beats as $b) : ?>
-            <div class="beat-card">
-                <div>
+            <div class="<?= $b->getCssClass() ?>"> <div>
                     <div class="beat-header">
-                        <a href="<?= base_url('/beats/' . (int)$b['id']) ?>" class="beat-title">
-                            <?= esc($b['title'] ?? '') ?>
-                        </a>
-                        <span class="beat-price"><?= esc($b['price'] ?? '—') ?>€</span>
-                    </div>
+                        <a href="<?= base_url('/beats/' . (int)$b->getData()['id']) ?>" class="beat-title">
+                            <?= esc($b->getTitle()) ?> </a>
+                        <span class="beat-price"><?= esc($b->getPrice()) ?>€</span> </div>
 
                     <div class="beat-info">
-                        <span class="info-tag"><?= esc($b['category_name'] ?? 'Sans genre') ?></span>
-                        <span class="info-tag"><?= esc($b['bpm'] ?? '—') ?> BPM</span>
-                        <span class="info-tag"><?= esc($b['musical_key'] ?? '—') ?></span>
+                        <span class="info-tag"><?= esc($b->getData()['category_name'] ?? 'Sans genre') ?></span>
+                        <span class="info-tag"><?= esc($b->getData()['bpm'] ?? '—') ?> BPM</span>
+                        <span class="info-tag"><?= esc($b->getData()['musical_key'] ?? '—') ?></span>
                     </div>
                 </div>
 
                 <div class="beat-seller">
-                    Par <strong><?= esc($b['seller_username'] ?? 'Anonyme') ?></strong>
+                    Par <strong><?= esc($b->getData()['seller_username'] ?? 'Anonyme') ?></strong>
                 </div>
             </div>
         <?php endforeach; ?>

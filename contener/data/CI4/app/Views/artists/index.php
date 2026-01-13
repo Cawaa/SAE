@@ -8,6 +8,24 @@
 
 <h1>Artistes</h1>
 
+<?php
+$avatarUrl = static function (?string $avatarRel): string {
+    $avatarRel = (string)($avatarRel ?? '');
+    if ($avatarRel === '') {
+        return base_url('images/default.png');
+    }
+    
+    $avatarRel = str_replace(['..', '\\'], ['', '/'], $avatarRel);
+    $avatarRel = ltrim($avatarRel, '/');
+
+    if (!str_starts_with($avatarRel, 'avatars/')) {
+        return base_url('images/default.png');
+    }
+
+    return base_url('images/' . $avatarRel);
+};
+?>
+
 <section class="artist-section">
   <h2>Les beatmakers qui vendent le plus</h2>
 
@@ -15,11 +33,7 @@
     <?php foreach ($topSellers as $u): ?>
       <div class="artist-card">
         <div class="artist-avatar">
-          <?php if (!empty($u['avatar'])): ?>
-            <img src="<?= base_url('images/' . esc($u['avatar'])) ?>" alt="Avatar">
-          <?php else: ?>
-            <img src="<?= base_url('images/default.png') ?>" alt="Avatar">
-          <?php endif; ?>
+          <img src="<?= esc($avatarUrl($u['avatar'] ?? null)) ?>" alt="Avatar">
         </div>
 
         <div class="artist-name"><?= esc($u['username']) ?></div>
@@ -49,7 +63,7 @@
     <?php foreach ($topPosters as $u): ?>
       <div class="artist-card">
         <div class="artist-avatar">
-          <img src="<?= !empty($u['avatar']) ? base_url('images/' . esc($u['avatar'])) : base_url('images/default.png') ?>" alt="Avatar">
+          <img src="<?= esc($avatarUrl($u['avatar'] ?? null)) ?>" alt="Avatar">
         </div>
 
         <div class="artist-name"><?= esc($u['username']) ?></div>

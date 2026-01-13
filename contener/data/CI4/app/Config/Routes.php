@@ -161,3 +161,9 @@ $routes->post('/cart/clear', 'CartController::clear');
 
 $routes->get('/cart/checkout', 'CartController::checkoutForm');
 $routes->post('/cart/checkout', 'CartController::checkout');
+
+$routes->group('admin', ['filter' => 'adminAuth'], static function ($routes) {
+    $routes->get('/', 'AdminController::index');
+    $routes->post('users/delete/(:num)', 'AdminController::deleteUser/$1');
+    $routes->post('beats/delete/(:num)', 'AdminController::deleteBeat/$1');
+});

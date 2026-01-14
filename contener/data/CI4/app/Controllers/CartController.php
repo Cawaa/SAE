@@ -8,14 +8,22 @@ use App\Events\AchatTermineEvent;
 use App\Events\Observers\InventoryManager;
 use App\Events\Observers\NotificationService;
 
+// Contrôleur pour la gestion du panier.
 class CartController extends BaseController
 {
+    
     private const COOKIE_NAME = 'tempo_cart';
     private const COOKIE_DAYS = 30;
 
+    // Affiche le contenu du panier (accès uniquement connecté).
     public function show()
     {
-        [$cartId, $isLoggedIn] = $this->getOrCreateCartId();
+        if (!(bool)session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'Connecte-toi pour accéder au panier.');
+        }
+
+        [$cartId] = $this->getOrCreateCartId();
+        $isLoggedIn = true;
 
         $itemModel = new CartItemModel();
 
@@ -27,6 +35,7 @@ class CartController extends BaseController
         $total = 0.0;
         $hasUnavailable = false;
 
+        // Calcul du total et vérification des indisponibilités
         foreach ($rows as $r) {
             $qty = (int)$r['quantite'];
             $price = (float)$r['price'];
@@ -51,8 +60,13 @@ class CartController extends BaseController
         ]);
     }
 
+    // Ajoute un beat au panier (accès uniquement connecté).
     public function add(int $beatId)
     {
+        if (!(bool)session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'Connecte-toi pour ajouter au panier.');
+        }
+
         [$cartId] = $this->getOrCreateCartId();
 
         // Vérif disponibilité du beat
@@ -78,8 +92,13 @@ class CartController extends BaseController
         return redirect()->to('/cart')->with('success', 'Ajouté au panier.');
     }
 
+    // Retire une unité d'un beat du panier (accès uniquement connecté).
     public function remove(int $beatId)
     {
+        if (!(bool)session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'Connecte-toi pour modifier le panier.');
+        }
+
         [$cartId] = $this->getOrCreateCartId();
 
         $itemModel = new CartItemModel();
@@ -90,8 +109,13 @@ class CartController extends BaseController
         return redirect()->to('/cart');
     }
 
+    // Retire complètement un beat du panier (accès uniquement connecté).
     public function removeLine(int $beatId)
     {
+        if (!(bool)session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'Connecte-toi pour modifier le panier.');
+        }
+
         [$cartId] = $this->getOrCreateCartId();
 
         $itemModel = new CartItemModel();
@@ -102,6 +126,7 @@ class CartController extends BaseController
         return redirect()->to('/cart');
     }
 
+    // Affiche le formulaire de checkout.
     public function checkoutForm()
     {
         $isLoggedIn = (bool)session()->get('isLoggedIn');
@@ -117,6 +142,7 @@ class CartController extends BaseController
         $total = 0.0;
         $hasUnavailable = false;
 
+        // Calcul du total et vérification des indisponibilités
         foreach ($rows as $r) {
             $isAvailable = ($r['status'] === 'active' && empty($r['buyer_id']));
             if (!$isAvailable) $hasUnavailable = true;
@@ -129,6 +155,7 @@ class CartController extends BaseController
         ]);
     }
 
+    // Traite le traitement du checkout.
     public function checkout()
     {
         $userId = (int)(session()->get('user_id') ?? 0);
@@ -156,6 +183,7 @@ class CartController extends BaseController
             }
         }
 
+        // Transaction d'achat
         $db->transBegin();
         try {
             $totalCents = 0;
@@ -232,7 +260,7 @@ class CartController extends BaseController
             return redirect()->to('/cart')->with('error', 'Checkout impossible : ' . $e->getMessage());
         }
 
-        // ✅ Seule modif demandée : rediriger vers la page Merci (orderId)
+        // rediriger vers la page Merci en affichant l'orderId
         return redirect()->to('/checkout/thanks/' . $orderId)->with('success', 'Achat effectué !');
     }
 
@@ -281,85 +309,40 @@ class CartController extends BaseController
         ]);
     }
 
-    /**
-     * Retourne [cartId, isLoggedIn]
-     */
+    // Récupère ou crée le panier de l'utilisateur connecté.
     private function getOrCreateCartId(): array
     {
         $session = session();
-        $isLoggedIn = (bool)$session->get('isLoggedIn');
         $userId = (int)($session->get('user_id') ?? 0);
+
+        if ($userId <= 0 || !(bool)$session->get('isLoggedIn')) {
+            throw new \RuntimeException('Accès panier sans authentification.');
+        }
 
         $db = db_connect();
 
-        // guest token cookie
-        $guestToken = (string)($this->request->getCookie(self::COOKIE_NAME) ?? '');
+        $userCart = $db->table('carts')->where('user_id', $userId)->get()->getRowArray();
 
-        if ($isLoggedIn && $userId > 0) {
-            // cart user
-            $userCart = $db->table('carts')->where('user_id', $userId)->get()->getRowArray();
-
-            if (!$userCart) {
-                $db->table('carts')->insert([
-                    'user_id'     => $userId,
-                    'guest_token' => null,
-                    'created_at'  => date('Y-m-d H:i:s'),
-                    'updated_at'  => date('Y-m-d H:i:s'),
-                ]);
-                $userCart = $db->table('carts')->where('user_id', $userId)->get()->getRowArray();
-            }
-
-            // merge guest cart dans user cart
-            if (!empty($guestToken)) {
-                $guestCart = $db->table('carts')->where('guest_token', $guestToken)->get()->getRowArray();
-                if ($guestCart && (int)$guestCart['id'] !== (int)$userCart['id']) {
-                    $itemModel = new CartItemModel();
-                    $guestItems = $itemModel->where('cart_id', (int)$guestCart['id'])->findAll();
-
-                    foreach ($guestItems as $gi) {
-                        $itemModel->upsertIncrement((int)$userCart['id'], (int)$gi['beat_id'], (int)$gi['quantite']);
-                    }
-
-                    // delete guest cart + items
-                    $itemModel->clearCart((int)$guestCart['id']);
-                    $db->table('carts')->where('id', (int)$guestCart['id'])->delete();
-                }
-            }
-
-            return [(int)$userCart['id'], true];
-        }
-
-        // Guest flow
-        if (empty($guestToken)) {
-            $guestToken = bin2hex(random_bytes(16));
-            $this->response->setCookie([
-                'name'   => self::COOKIE_NAME,
-                'value'  => $guestToken,
-                'expire' => self::COOKIE_DAYS * 24 * 60 * 60,
-                'path'   => '/',
-                'secure' => false,
-                'httponly' => true,
-                'samesite' => 'Lax',
-            ]);
-        }
-
-        $guestCart = $db->table('carts')->where('guest_token', $guestToken)->get()->getRowArray();
-
-        if (!$guestCart) {
+        if (!$userCart) {
             $db->table('carts')->insert([
-                'user_id'     => null,
-                'guest_token' => $guestToken,
+                'user_id'     => $userId,
+                'guest_token' => null,
                 'created_at'  => date('Y-m-d H:i:s'),
                 'updated_at'  => date('Y-m-d H:i:s'),
             ]);
-            $guestCart = $db->table('carts')->where('guest_token', $guestToken)->get()->getRowArray();
+            $userCart = $db->table('carts')->where('user_id', $userId)->get()->getRowArray();
         }
 
-        return [(int)$guestCart['id'], false];
+        return [(int)$userCart['id'], true];
     }
 
+    // Vide complètement le panier.
     public function clear()
     {
+        if (!(bool)session()->get('isLoggedIn')) {
+            return redirect()->to('/login')->with('error', 'Connecte-toi pour vider le panier.');
+        }
+
         [$cartId] = $this->getOrCreateCartId();
         $itemModel = new \App\Models\CartItemModel();
         $itemModel->clearCart($cartId);

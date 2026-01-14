@@ -7,8 +7,10 @@ use App\Models\MessageModel;
 use App\Models\BeatModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
+// Contrôleur pour la gestion des conversations entre utilisateurs.
 class ConversationsController extends BaseController
 {
+    // Affiche la liste des conversations de l'utilisateur connecté.
     public function index()
     {
         $userId = (int) (session()->get('user_id') ?? 0);
@@ -23,6 +25,7 @@ class ConversationsController extends BaseController
         ]);
     }
 
+    // Affiche une conversation spécifique avec ses messages.
     public function show(int $conversationId)
     {
         $userId = (int) (session()->get('user_id') ?? 0);
@@ -48,6 +51,7 @@ class ConversationsController extends BaseController
         ]);
     }
 
+    // Démarre une nouvelle conversation à propos d'un beat.
     public function start(int $beatId)
     {
         $userId = (int) (session()->get('user_id') ?? 0);

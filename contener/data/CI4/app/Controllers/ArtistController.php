@@ -4,10 +4,12 @@ namespace App\Controllers;
 
 use App\Models\ArtistSpotlightModel;
 
+// Contrôleur pour la page des artistes.
 class ArtistController extends BaseController
 {
     public function index()
     {
+        // Récupère les artistes en vedette.
         $spot = new ArtistSpotlightModel();
 
         $topSellers = $spot->getTopSellers(8);

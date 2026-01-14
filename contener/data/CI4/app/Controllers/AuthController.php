@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 
+// Contrôleur pour l'authentification des utilisateurs.
 class AuthController extends BaseController
 {
     public function loginForm()
@@ -21,6 +22,7 @@ class AuthController extends BaseController
 
     public function login()
     {
+        // Récupère et valide les données du formulaire envoyé en POST
         $email    = trim((string) $this->request->getPost('email'));
         $password = (string) $this->request->getPost('password');
 
@@ -28,6 +30,7 @@ class AuthController extends BaseController
             return redirect()->to('/login')->with('error', 'Champs manquants.');
         }
 
+        // Vérifie si les identifiants sont corrects
         $userModel = new UserModel();
         $user = $userModel->where('email', strtolower($email))->first();
 
@@ -51,6 +54,7 @@ class AuthController extends BaseController
         return redirect()->to('/');
     }
 
+    // Affiche le formulaire d'inscription.
     public function registerForm()
     {
         if (session()->get('user_id')) {

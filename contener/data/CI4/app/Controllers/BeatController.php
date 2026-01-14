@@ -9,13 +9,18 @@ use CodeIgniter\Exceptions\PageNotFoundException;
 use App\Decorators\BaseBeat;
 use App\Decorators\PromoDecorator;
 
+/*
+ * Contrôleur pour la gestion des beats (affichage, création, édition, téléchargement).
+ */
 class BeatController extends BaseController
 {
+    // Affiche la liste des beats disponibles.
     public function index()
     {
         $beatModel = new BeatModel();
         $catModel  = new CategoryModel();
 
+        // Récupère les beats avec décorateurs
         $rawBeats = $beatModel->getDefaultFeed(24);
         $decoratedBeats = $this->decorateBeats($rawBeats); // Transformation ici
 
@@ -28,6 +33,7 @@ class BeatController extends BaseController
         ]);
     }
 
+    // Recherche de beats avec filtres.
     public function search()
     {
         $filters = [
@@ -64,8 +70,7 @@ class BeatController extends BaseController
         foreach ($beats as $data) {
             $beat = new BaseBeat($data);
 
-            // Exemple : si le prix est > 50€, on pourrait imaginer une promo auto
-            // Ou utiliser un champ 'is_promo' si vous l'ajoutez en base de données
+            // Applique le décorateur de promotion si le prix est supérieur à 50
             if ($beat->getPrice() > 50) {
                 $beat = new PromoDecorator($beat);
             }
@@ -75,6 +80,7 @@ class BeatController extends BaseController
         return $result;
     }
 
+    // Affiche les détails d'un beat spécifique.
     public function show(int $id)
     {
         $beatModel = new BeatModel();
@@ -94,6 +100,7 @@ class BeatController extends BaseController
         ]);
     }
 
+    // Affiche le formulaire de création d'un nouveau beat.
     public function createForm()
     {
         // sécurité simple si quelqu’un envoie un formulaire énorme
@@ -115,6 +122,7 @@ class BeatController extends BaseController
         ]);
     }
 
+    // Traite la création d'un nouveau beat.
     public function create()
     {
         $userId = (int) (session()->get('user_id') ?? 0);
@@ -445,6 +453,7 @@ class BeatController extends BaseController
         }
     }
 
+    // Affiche les beats du vendeur connecté.
     public function myBeats()
     {
         $userId = (int) (session()->get('user_id') ?? 0);
@@ -461,6 +470,7 @@ class BeatController extends BaseController
         ]);
     }
 
+    // Permet le téléchargement d'un beat acheté.
     public function download(int $id)
     {
         $userId = (int) (session()->get('user_id') ?? 0);

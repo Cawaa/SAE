@@ -6,6 +6,7 @@ use App\Models\FavoriteModel;
 use App\Models\BeatModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
+// Contrôleur pour la gestion des favoris des utilisateurs.
 class FavoriteController extends BaseController
 {
     /**
@@ -16,6 +17,7 @@ class FavoriteController extends BaseController
         $userId = (int) (session()->get('user_id') ?? 0);
         if ($userId <= 0) return redirect()->to('/login');
 
+        // Récupère les favoris de l'utilisateur en base de données.
         $rows = $this->db->table('favorites f')
             ->select('b.*, f.created_at AS favorited_at, c.name AS category_name, u.username AS seller_username')
             ->join('beats b', 'b.id = f.beat_id')
@@ -32,21 +34,20 @@ class FavoriteController extends BaseController
         ]);
     }
 
-    /**
-     * POST /favorites/{beatId}/toggle
-     */
+    // Toggle le statut favori d'un beat pour l'utilisateur connecté.
     public function toggle(int $beatId)
     {
         $userId = (int) (session()->get('user_id') ?? 0);
         if ($userId <= 0) return redirect()->to('/login');
 
-        // beat existe ?
+        // Vérifie que le beat existe
         $beatModel = new BeatModel();
         $beat = $beatModel->find($beatId);
         if (!$beat) {
             throw new PageNotFoundException('Beat introuvable.');
         }
 
+        // Toggle le favori
         $favModel = new FavoriteModel();
         $isNowFav = $favModel->toggle($userId, $beatId);
 
@@ -54,9 +55,7 @@ class FavoriteController extends BaseController
         return redirect()->back()->with('success', $msg);
     }
 
-    /**
-     * POST /favorites/{beatId}/add
-     */
+    // ajoute un beat aux favoris de l'utilisateur connecté.
     public function add(int $beatId)
     {
         $userId = (int) (session()->get('user_id') ?? 0);
@@ -70,9 +69,7 @@ class FavoriteController extends BaseController
         return redirect()->back()->with('success', 'Ajouté aux favoris.');
     }
 
-    /**
-     * POST /favorites/{beatId}/remove
-     */
+    // retire un beat des favoris de l'utilisateur connecté.
     public function remove(int $beatId)
     {
         $userId = (int) (session()->get('user_id') ?? 0);

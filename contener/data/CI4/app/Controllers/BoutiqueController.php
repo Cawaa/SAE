@@ -4,11 +4,11 @@ namespace App\Controllers;
 
 use App\Models\BeatModel;
 
+// Contrôleur pour la page de la boutique.
 class BoutiqueController extends BaseController
 {
-    /**
-     * Alias possible d'une page "boutique"
-     */
+    
+    // Affiche la liste des beats disponibles dans la boutique.
     public function index()
     {
         $beatModel = new BeatModel();

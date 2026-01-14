@@ -9,8 +9,18 @@ use App\Models\SubscriptionModel;
 use App\Models\WalletModel;
 use CodeIgniter\I18n\Time;
 
+/**
+ * Contrôleur de gestion du compte utilisateur.
+ * Gère les opérations liées au profil, aux favoris, conversations, wallet et abonnements.
+ */
 class AccountController extends BaseController
 {
+    /**
+     * Vérifie que l'utilisateur est connecté.
+     * Redirige vers la page de connexion si non authentifié.
+     * 
+     * @return int|object L'ID utilisateur si authentifié, sinon une redirection
+     */
     private function requireLogin()
     {
         $userId = (int) (session()->get('user_id') ?? 0);
@@ -20,6 +30,10 @@ class AccountController extends BaseController
         return $userId;
     }
 
+    /**
+     * Affiche le tableau de bord du compte avec les statistiques de l'utilisateur.
+     * Récupère le nombre de beats, favoris, conversations et infos de wallet.
+     */
     public function index()
     {
         $userId = $this->requireLogin();
@@ -28,7 +42,7 @@ class AccountController extends BaseController
         $userModel = new UserModel();
         $user = $userModel->find($userId);
 
-        // Stats simples
+        // Récupération des statistiques simples
         $db = db_connect();
 
         $beatsTotal  = (int) $db->table('beats')->where('user_id', $userId)->countAllResults();
@@ -77,6 +91,11 @@ class AccountController extends BaseController
         ]);
     }
 
+     /**
+     * Met à jour le profil utilisateur (genre artistique et avatar).
+     * Valide les fichiers d'avatar et les stocke dans /images/avatars/
+     */
+
     public function updateProfile()
     {
         $userId = $this->requireLogin();
@@ -121,6 +140,9 @@ class AccountController extends BaseController
             $newName = $file->getRandomName();
             $file->move($avatarDir, $newName, true);
 
+            // Suppression de l'ancien avatar s'il existait
+            $file->move($avatarDir, $newName, true);
+
             // Supprimer l'ancien avatar si c'est un fichier uploadé (avatars/*)
             $old = (string)($user['avatar'] ?? '');
             if ($old !== '' && str_starts_with($old, 'avatars/')) {
@@ -139,6 +161,8 @@ class AccountController extends BaseController
         return redirect()->to('/account/profile')->with('success', 'Profil mis à jour.');
     }
 
+    // Affiche la liste des beats favoris de l'utilisateur.
+     
     public function favorites()
     {
         $userId = $this->requireLogin();
@@ -159,6 +183,7 @@ class AccountController extends BaseController
         ]);
     }
 
+    // Affiche la liste des conversations de l'utilisateur.
     public function conversations()
     {
         $userId = $this->requireLogin();
@@ -174,11 +199,15 @@ class AccountController extends BaseController
         ]);
     }
 
+    // Redirige vers la liste des beats de l'utilisateur.
     public function beatsIndex()
     {
         return redirect()->to('/my/beats');
     }
 
+    /**
+     * Redirige vers le formulaire de création de beat.
+     */
     public function beatCreateForm()
     {
         return redirect()->to('/beats/create');
@@ -284,10 +313,7 @@ class AccountController extends BaseController
         }
 
         // Sinon on crée un abonnement actif
-        // Sinon on crée un abonnement actif
-        // Sinon on crée un abonnement actif
-        // Sinon on crée un abonnement actif
-        // Sinon on crée un abonnement actif
+      
         $subModel->insert([
             'user_id' => $userId,
             'type' => $type,

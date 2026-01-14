@@ -12,13 +12,13 @@
 $avatarUrl = static function (?string $avatarRel): string {
     $avatarRel = (string)($avatarRel ?? '');
     if ($avatarRel === '') {
-        return base_url('images/default.png');
+        return base_url('images/avatars/default.jpg');
     }
     
     $avatarRel = str_replace(['..', '\\'], ['', '/'], $avatarRel);
     $avatarRel = ltrim($avatarRel, '/');
 
-    return base_url('images/' . $avatarRel);
+    return base_url('images/avatars/' . $avatarRel);
 };
 ?>
 

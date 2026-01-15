@@ -83,15 +83,4 @@
             </div>
         <?php endif; ?>
     </div>
-
-    <h2 class="section-title">Stats</h2>
-    <div class = "divider"></div>
-    <?php if (!empty($stats)) : ?>
-        <div class="home-card stats-container-variant">
-            <div class="stat-item"><strong><?= esc($stats['active_beats'] ?? 0) ?></strong> <span>Beats Actifs</span></div>
-            <div class="stat-item"><strong><?= esc($stats['total_beats'] ?? 0) ?></strong> <span>Total Beats</span></div>
-            <div class="stat-item"><strong><?= esc($stats['sold_beats'] ?? 0) ?></strong> <span>Vendus</span></div>
-            <div class="stat-item"><strong><?= esc($stats['total_users'] ?? 0) ?></strong> <span>Utilisateurs</span></div>
-        </div>
-    <?php endif; ?>
 <?= $this->endSection() ?>

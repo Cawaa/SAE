@@ -128,6 +128,7 @@ mkdir -p writable/cache writable/debugbar writable/logs writable/session writabl
 chmod -R 777 writable
 mkdir -p public/images/avatars
 chmod -R 777 public/images/avatars
+chmod -R 777 public/uploads
 mv env .env
 php spark migrate
 php spark db:seed DatabaseSeeder

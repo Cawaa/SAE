@@ -38,6 +38,13 @@
             <input type="password" name="confirm_password" placeholder="••••••••" required>
         </div>
 
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; font-weight: normal; cursor: pointer;">
+                <input type="checkbox" name="accept_conditions" value="1" required style="margin-top: 3px; cursor: pointer;">
+                <span>J'accepte les <a href="<?= site_url('/conditions-utilisation') ?>" target="_blank" style="color: #3b82f6; text-decoration: underline;">Conditions Générales d'Utilisation</a></span>
+            </label>
+        </div>
+
         <button type="submit" class="btn-beatflow">Créer mon compte</button>
     </form>
 

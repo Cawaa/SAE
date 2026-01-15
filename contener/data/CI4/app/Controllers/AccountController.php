@@ -18,7 +18,7 @@ class AccountController extends BaseController
     /**
      * Vérifie que l'utilisateur est connecté.
      * Redirige vers la page de connexion si non authentifié.
-     * 
+     *
      * @return int|object L'ID utilisateur si authentifié, sinon une redirection
      */
     private function requireLogin()
@@ -91,11 +91,10 @@ class AccountController extends BaseController
         ]);
     }
 
-     /**
+    /**
      * Met à jour le profil utilisateur (genre artistique et avatar).
      * Valide les fichiers d'avatar et les stocke dans /images/avatars/
      */
-
     public function updateProfile()
     {
         $userId = $this->requireLogin();
@@ -158,8 +157,110 @@ class AccountController extends BaseController
         return redirect()->to('/account/profile')->with('success', 'Profil mis à jour.');
     }
 
+    /**
+     * RGPD : suppression/anonymisation du compte utilisateur.
+     */
+    public function deleteAccount()
+    {
+        $userId = $this->requireLogin();
+        if (!is_int($userId)) return $userId;
+
+        $userModel = new UserModel();
+        $user = $userModel->find($userId);
+        if (!$user) {
+            return redirect()->to('/account')->with('error', 'Utilisateur introuvable.');
+        }
+
+        // On garde l'ancien avatar pour suppression après commit
+        $oldAvatar = (string) ($user['avatar'] ?? '');
+
+        $db = db_connect();
+
+        try {
+            // Si une requête SQL échoue, on veut une exception (plus simple à debug)
+            $db->transException(true)->transStart();
+
+            // 1) Nettoyage des données associées
+
+            // Favoris
+            $db->table('favorites')->where('user_id', $userId)->delete();
+
+            // Conversations (et messages via cascade FK conversation_id)
+            $db->table('conversations')
+                ->groupStart()
+                    ->where('buyer_id', $userId)
+                    ->orWhere('seller_id', $userId)
+                ->groupEnd()
+                ->delete();
+
+            // Carts (et cart_items via cascade)
+            $db->table('carts')->where('user_id', $userId)->delete();
+
+            // Wallet : attention -> tables réelles = wallets + wallet_transactions
+            $db->table('wallet_transactions')->where('user_id', $userId)->delete();
+            $db->table('wallets')->where('user_id', $userId)->delete();
+
+            // Subscriptions
+            $db->table('subscriptions')->where('user_id', $userId)->delete();
+
+            // Orders : dépersonnaliser (garder l'historique, mais plus lié à l'utilisateur)
+            $db->table('orders')->where('user_id', $userId)->set(['user_id' => null])->update();
+
+            // 2) Anonymisation du compte
+            // email & username doivent rester uniques -> valeurs "placeholder" uniques
+            $email = 'deleted+' . $userId . '@tempo.local';
+            $username = 'Artiste supprimé #' . $userId;
+
+            // password inutilisable (hash random)
+            $random = bin2hex(random_bytes(32));
+            $passwordHash = password_hash($random, PASSWORD_DEFAULT);
+
+            $userModel->update($userId, [
+                'email'         => $email,
+                'username'      => $username,
+                'password_hash' => $passwordHash,
+                'avatar'        => null,
+                'artist_genre'  => null,
+                // optionnel : rend le compte clairement "supprimé"
+                'role'          => 'deleted',
+            ]);
+
+            $db->transComplete();
+        } catch (\Throwable $e) {
+            // Rollback si besoin
+            if ($db->transStatus() !== false) {
+                // si transException(true), la transaction est déjà en rollback,
+                // mais on laisse ça safe.
+                try { $db->transRollback(); } catch (\Throwable $ignored) {}
+            }
+
+            // Message utile pour debug (en dev)
+            return redirect()->to('/account/profile')->with(
+                'error',
+                'Erreur lors de la suppression du compte (transaction) : ' . $e->getMessage()
+            );
+        }
+
+        if ($db->transStatus() === false) {
+            return redirect()->to('/account/profile')->with('error', 'Erreur lors de la suppression du compte (transaction).');
+        }
+
+        // 3) Supprimer le fichier avatar après commit (si upload avatars/*)
+        if ($oldAvatar !== '' && str_starts_with($oldAvatar, 'avatars/')) {
+            $oldAvatar = str_replace(['..', '\\'], ['', '/'], $oldAvatar);
+            $oldAbs = rtrim(\FCPATH, '/\\') . '/images/' . ltrim($oldAvatar, '/');
+            if (is_file($oldAbs)) {
+                @unlink($oldAbs);
+            }
+        }
+
+        // 4) Déconnexion
+        session()->destroy();
+
+        return redirect()->to('/')->with('success', 'Votre compte a été supprimé (données anonymisées).');
+    }
+
     // Affiche la liste des beats favoris de l'utilisateur.
-     
     public function favorites()
     {
         $userId = $this->requireLogin();
@@ -310,7 +411,6 @@ class AccountController extends BaseController
         }
 
         // Sinon on crée un abonnement actif
-      
         $subModel->insert([
             'user_id' => $userId,
             'type' => $type,

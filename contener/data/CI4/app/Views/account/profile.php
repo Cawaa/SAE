@@ -2,6 +2,7 @@
 <?= $this->section('extra-css') ?>
     <link rel="stylesheet" href="<?= base_url('css/account.css') ?>">
 <?= $this->endSection() ?>
+
 <?= $this->section('content') ?>
 
 <div class="container">
@@ -19,7 +20,7 @@
 
         <div class="form-group">
             <label for="artist_genre">Genre musical (optionnel)</label>
-            <input type="text" id="artist_genre" name="artist_genre" 
+            <input type="text" id="artist_genre" name="artist_genre"
                    value="<?= esc($user['artist_genre'] ?? '') ?>"
                    placeholder="Ex: Hip-Hop, EDM, Trap...">
         </div>
@@ -32,6 +33,24 @@
 
         <button type="submit" class="btn">Enregistrer les modifications</button>
     </form>
+
+    <hr style="margin: 24px 0;">
+
+    <div class="danger-zone">
+        <h2 style="margin-bottom: 8px;">Zone dangereuse</h2>
+        <p style="margin-top: 0; margin-bottom: 12px;">
+            La suppression de votre compte supprime/anonymise vos données personnelles.
+            Vos instrumentales publiées resteront visibles, mais votre identité sera anonymisée.
+        </p>
+
+        <form method="post" action="<?= site_url('/account/delete') ?>"
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.');">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-danger" style="background:#c0392b; border-color:#c0392b;">
+                Supprimer mon compte
+            </button>
+        </form>
+    </div>
 
     <a href="<?= site_url('/account') ?>" class="back-link">← Retour Mon compte</a>
 </div>

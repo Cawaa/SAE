@@ -30,8 +30,8 @@ class UsersSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'email' => 'beatmaker1@tempo.test',
-                'username' => 'beatmaker1',
+                'email' => 'viperbeats@tempo.test',
+                'username' => 'Viper Beats',
                 'password_hash' => password_hash('test0', PASSWORD_DEFAULT),
                 'role' => 'user',
                 'avatar' => 'avatars/prod1.jpg',
@@ -39,8 +39,8 @@ class UsersSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'email' => 'beatmaker2@tempo.test',
-                'username' => 'beatmaker2',
+                'email' => 'shadowonthetrack@tempo.test',
+                'username' => 'Shadow On The Track',
                 'password_hash' => password_hash('test0', PASSWORD_DEFAULT),
                 'role' => 'user',
                 'avatar' => 'avatars/prod2.jpg',
@@ -48,8 +48,8 @@ class UsersSeeder extends Seeder
                 'created_at' => $now,
             ],
             [
-                'email' => 'beatmaker3@tempo.test',
-                'username' => 'beatmaker3',
+                'email' => 'glitchkid@tempo.test',
+                'username' => 'Glitch Kid',
                 'password_hash' => password_hash('test0', PASSWORD_DEFAULT),
                 'role' => 'user',
                 'avatar' => 'avatars/prod3.jpg',

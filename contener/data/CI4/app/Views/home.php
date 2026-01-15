@@ -22,24 +22,32 @@
         <div class = "divider"></div>
         
         <div class="artist-grid">
-            <div class="artist-card">
-                <div class="img-container">
-                    <img src="<?= base_url('./images/avatars/prod1.jpg') ?>" alt="S3R4PH1M">
+            <a href="<?= base_url('/artists/3') ?>" class="artist-card-link">
+                <div class="artist-card">
+                    <div class="img-container">
+                        <img src="<?= base_url('./images/avatars/prod1.jpg') ?>" alt="Viper Beats">
+                    </div>
+                    <h3>Viper Beats</h3>
                 </div>
-                <h3>Viper Beats</h3>
-            </div>
-            <div class="artist-card">
-                <div class="img-container">
-                    <img src="<?= base_url('./images/avatars/prod2.jpg') ?>" alt="Vladimir cauchemar">
+            </a>
+
+            <a href="<?= base_url('/artists/4') ?>" class="artist-card-link">
+                <div class="artist-card">
+                    <div class="img-container">
+                        <img src="<?= base_url('./images/avatars/prod2.jpg') ?>" alt="Shadow On The Track">
+                    </div>
+                    <h3>Shadow On The Track</h3>
                 </div>
-                <h3>Shadow On The Track</h3>
-            </div>
-            <div class="artist-card">
-                <div class="img-container">
-                    <img src="<?= base_url('./images/avatars/prod3.jpg') ?>" alt="Perceval">
+            </a>
+
+            <a href="<?= base_url('/artists/5') ?>" class="artist-card-link">
+                <div class="artist-card">
+                    <div class="img-container">
+                        <img src="<?= base_url('./images/avatars/prod3.jpg') ?>" alt="Glitch Kid">
+                    </div>
+                    <h3>Glitch Kid</h3>
                 </div>
-                <h3>Glitch Kid</h3>
-            </div>
+            </a>
         </div>
     </section>
 

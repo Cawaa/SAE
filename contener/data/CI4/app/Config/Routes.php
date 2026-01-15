@@ -39,6 +39,7 @@ $routes->get('/logout', 'AuthController::logout');
 
 /* Page des artistes */
 $routes->get('/artists', 'ArtistController::index');
+$routes->get('/artists/(:num)', 'ArtistController::show/$1');
 
 /*
 |--------------------------------------------------------------------------

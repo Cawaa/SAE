@@ -79,23 +79,28 @@
 <?php else : ?>
     <div class="beats-grid">
         <?php foreach ($beats as $b) : ?>
-            <div class="<?= $b->getCssClass() ?>"> <div>
-                    <div class="beat-header">
-                        <a href="<?= base_url('/beats/' . (int)$b->getData()['id']) ?>" class="beat-title">
-                            <?= esc($b->getTitle()) ?> </a>
-                        <span class="beat-price"><?= esc($b->getPrice()) ?>€</span> </div>
+            <a href="<?= base_url('/beats/' . (int)$b->getData()['id']) ?>" class="beat-card-link-boutique">
+                <div class="<?= $b->getCssClass() ?>">
+                    <div>
+                        <div class="beat-header">
+                            <div class="beat-title">
+                                <?= esc($b->getTitle()) ?>
+                            </div>
+                            <span class="beat-price"><?= esc($b->getPrice()) ?>€</span>
+                        </div>
 
-                    <div class="beat-info">
-                        <span class="info-tag"><?= esc($b->getData()['category_name'] ?? 'Sans genre') ?></span>
-                        <span class="info-tag"><?= esc($b->getData()['bpm'] ?? '—') ?> BPM</span>
-                        <span class="info-tag"><?= esc($b->getData()['musical_key'] ?? '—') ?></span>
+                        <div class="beat-info">
+                            <span class="info-tag"><?= esc($b->getData()['category_name'] ?? 'Sans genre') ?></span>
+                            <span class="info-tag"><?= esc($b->getData()['bpm'] ?? '—') ?> BPM</span>
+                            <span class="info-tag"><?= esc($b->getData()['musical_key'] ?? '—') ?></span>
+                        </div>
+                    </div>
+
+                    <div class="beat-seller">
+                        Par <strong><?= esc($b->getData()['seller_username'] ?? 'Anonyme') ?></strong>
                     </div>
                 </div>
-
-                <div class="beat-seller">
-                    Par <strong><?= esc($b->getData()['seller_username'] ?? 'Anonyme') ?></strong>
-                </div>
-            </div>
+            </a>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>

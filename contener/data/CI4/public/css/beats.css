@@ -144,20 +144,31 @@
     margin: 0 10% 40px 10%;
 }
 
+.beat-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .home-card {
     background: #eef5ff;
     padding: 25px;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     transition: 0.3s;
+    height: 100%;
 }
 
-.beat-card-variant:hover {
+.beat-card-variant {
+    cursor: pointer;
+}
+
+.beat-card-link:hover .beat-card-variant {
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
 
-.beat-card-variant h3 a {
+.beat-card-variant h3 {
     color: #2F6BFF;
     text-decoration: none;
     font-size: 1.2rem;

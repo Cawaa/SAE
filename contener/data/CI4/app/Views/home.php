@@ -55,24 +55,22 @@
         <?php else : ?>
             <div class="beats-grid">
                 <?php foreach ($beatsList as $b) : ?>
-                    <div class="home-card beat-card-variant">
-                        <div class="beat-info">
-                            <h3>
-                                <a href="<?= base_url('/beats/' . (int)$b['id']) ?>">
-                                    <?= esc($b['title']) ?>
-                                </a>
-                            </h3>
-                            <p class="beat-genre"><?= esc($b['category_name'] ?? 'Sans genre') ?></p>
-                            <div class="beat-details">
-                                <span><?= esc($b['bpm'] ?? '—') ?> BPM</span>
-                                <span><?= esc($b['musical_key'] ?? '—') ?></span>
+                    <a href="<?= base_url('/beats/' . (int)$b['id']) ?>" class="beat-card-link">
+                        <div class="home-card beat-card-variant">
+                            <div class="beat-info">
+                                <h3><?= esc($b['title']) ?></h3>
+                                <p class="beat-genre"><?= esc($b['category_name'] ?? 'Sans genre') ?></p>
+                                <div class="beat-details">
+                                    <span><?= esc($b['bpm'] ?? '—') ?> BPM</span>
+                                    <span><?= esc($b['musical_key'] ?? '—') ?></span>
+                                </div>
+                            </div>
+                            <div class="beat-footer">
+                                <span class="beat-price"><?= esc($b['price']) ?> €</span>
+                                <small>par <strong><?= esc($b['seller_username'] ?? 'N/A') ?></strong></small>
                             </div>
                         </div>
-                        <div class="beat-footer">
-                            <span class="beat-price"><?= esc($b['price']) ?> €</span>
-                            <small>par <strong><?= esc($b['seller_username'] ?? 'N/A') ?></strong></small>
-                        </div>
-                    </div>
+                    </a>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>

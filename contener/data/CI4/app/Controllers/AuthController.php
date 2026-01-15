@@ -101,7 +101,27 @@ class AuthController extends BaseController
             return redirect()->to('/register')->with('error', 'Pseudo déjà utilisé.');
         }
 
-        // ...existing code...
+        // Créer l'utilisateur
+        $userId = $userModel->insert([
+            'username'      => $username,
+            'email'         => $email,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'role'          => 'user',
+        ]);
+
+        if (!$userId) {
+            return redirect()->to('/register')->with('error', 'Erreur lors de la création du compte.');
+        }
+
+        // Connecter l'utilisateur automatiquement
+        session()->set([
+            'user_id'    => (int) $userId,
+            'username'   => $username,
+            'role'       => 'user',
+            'isLoggedIn' => true,
+        ]);
+
+        return redirect()->to('/')->with('success', 'Compte créé avec succès !');
     }
 
     public function logout()

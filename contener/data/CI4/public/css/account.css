@@ -405,6 +405,184 @@
 }
 
 /* ============================================
+   FORMULAIRES
+   ============================================ */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--color-gray-900);
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    color: var(--color-gray-900);
+    background: white;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--color-blue-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: var(--color-gray-500);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--color-gray-500);
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   BOUTONS
+   ============================================ */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-blue-600);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: var(--color-blue-700);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+/* ============================================
+   MESSAGES & ALERTS
+   ============================================ */
+.message-success,
+.message-error,
+.message-info {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.message-success {
+    background: var(--color-green-50);
+    border: 1px solid var(--color-green-200);
+    color: var(--color-green-800);
+}
+
+.message-error {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.message-info {
+    background: var(--color-blue-50);
+    border: 1px solid var(--color-blue-100);
+    color: var(--color-blue-800);
+}
+
+/* ============================================
+   ZONE DANGEREUSE
+   ============================================ */
+.danger-zone {
+    background: #fef2f2;
+    border: 2px solid #fecaca;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.danger-zone h2 {
+    color: #991b1b;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.danger-zone p {
+    color: var(--color-gray-600);
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   LIENS
+   ============================================ */
+.back-link {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.75rem 1.5rem;
+    color: var(--color-blue-600);
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.back-link:hover {
+    background: var(--color-blue-50);
+    color: var(--color-blue-700);
+}
+
+/* ============================================
+   CONTAINER GENERAL
+   ============================================ */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+}
+
+.container h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--color-blue-500);
+    padding-bottom: 1rem;
+}
+
+.container hr {
+    border: none;
+    border-top: 1px solid var(--color-gray-200);
+}
+
+/* ============================================
    RESPONSIVE
    ============================================ */
 @media (max-width: 768px) {
@@ -427,5 +605,17 @@
     
     .navigation-grid {
         grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 1.5rem 1rem;
+    }
+
+    .container h1 {
+        font-size: 1.5rem;
+    }
+
+    .danger-zone {
+        padding: 1rem;
     }
 }

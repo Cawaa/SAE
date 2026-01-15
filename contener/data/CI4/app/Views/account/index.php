@@ -17,12 +17,23 @@
                 <?php
                     $avatarUrl = '';
                     if (!empty($user['avatar'])) {
-                        if (preg_match('#^https?://#', $user['avatar'])) {
-                            $avatarUrl = $user['avatar'];
-                        } elseif (str_starts_with($user['avatar'], 'uploads/') || str_starts_with($user['avatar'], 'images/')) {
-                            $avatarUrl = base_url($user['avatar']);
-                        } else {
-                            $avatarUrl = base_url('images/avatars/' . ltrim($user['avatar'], '/'));
+                        $avatar = (string)$user['avatar'];
+                        
+                        // Si c'est déjà une URL complète
+                        if (preg_match('#^https?://#', $avatar)) {
+                            $avatarUrl = $avatar;
+                        }
+                        // Si c'est un chemin avec images/ ou uploads/
+                        elseif (str_starts_with($avatar, 'images/') || str_starts_with($avatar, 'uploads/')) {
+                            $avatarUrl = base_url($avatar);
+                        }
+                        // Si c'est avatars/* (stocké en DB sans images/)
+                        elseif (str_starts_with($avatar, 'avatars/')) {
+                            $avatarUrl = base_url('images/' . $avatar);
+                        }
+                        // Sinon, on suppose que c'est un chemin relatif à images/
+                        else {
+                            $avatarUrl = base_url('images/avatars/' . ltrim($avatar, '/'));
                         }
                     }
                 ?>

@@ -32,10 +32,6 @@ $routes->get('/', 'HomeController::index');
 $routes->get('/mentions-legales', 'LegalController::mentions');
 $routes->get('/confidentialite', 'LegalController::privacy');
 $routes->get('/cgv', 'LegalController::cgv');
-
-// (optionnel) si vous avez une page conditions d'utilisation distincte
-$routes->get('/conditions-utilisation', 'LegalController::conditions');
-
 /*
 |--------------------------------------------------------------------------
 | Auth
@@ -191,3 +187,9 @@ $routes->group('admin', ['filter' => 'adminAuth'], static function (RouteCollect
     $routes->post('users/delete/(:num)', 'AdminController::deleteUser/$1');
     $routes->post('beats/delete/(:num)', 'AdminController::deleteBeat/$1');
 });
+
+// Dans la section Public ou Legal
+$routes->get('/conditions-utilisation', function() {
+    return view('legal/conditions'); // Ou pointez vers un contrôleur dédié
+});
+

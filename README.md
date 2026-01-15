@@ -1,74 +1,72 @@
-# Avant de push 
-## Toujours vérifier que le dossier vendor n'est pas listé dans les fichiers commited dans la commande git status
+# Projet Tempo - Guide de lancement
 
-Si c'est le cas faire `git rm -r --cached data/CI4/vendor`
+Ce dépôt contient notre application **CodeIgniter 4** et son environnement de conteneurisation basé sur **Podman**.
 
-## Lancer le projet Rapidement:
+## 1. Prérequis
 
+Avant de commencer, assurez-vous d'avoir installé les outils suivants :
+
+* **Podman** (CLI sur Linux ou Podman Desktop).
+* **Podman Compose**.
+* Un compte **Docker.io** (nécessaire pour le téléchargement des images MySQL et PHP).
+
+---
+
+## 2. Lancement du projet (Linux / IUT)
+
+Sur un système Linux déjà configuré (comme à l'IUT), suivez ces étapes pour lancer le projet rapidement :
+
+1. Ouvrez un terminal dans le dossier racine du projet.
+2. Accédez au dossier de l'environnement :
 ```bash
-cd eq_1_04_bracq-noe_devillers-tino_dufresne-elric_martin-sacha\contener
+cd contener
 
-./setup.sh
 ```
 
-Si erreur lors du ./setup.sh augmenter le temps d'attente dans le scripte ./setup.sh
 
-Si il y a une erreur d'image : rebuild l'image : 
+3. Lancez le script d'installation automatisé :
+```bash
+./setup.sh
+
+```
+
+
+*Ce script s'occupe de la connexion à docker.io, du démarrage des conteneurs, du transfert du code, de l'installation des dépendances (Composer) et de la préparation de la base de données*.
+
+### Accès aux services
+
+* **Application :** [http://localhost:8081](https://www.google.com/search?q=http://localhost:8081)
+* **BD phpMyAdmin :** [http://localhost:8082](https://www.google.com/search?q=http://localhost:8082)
+
+---
+
+## 3. Identifiants Admin
+
+Accéder à l'interface d'administration via /admin avec le compte :
+
+* **Email :** `admin@tempo.test`
+* **Mot de passe :** `admin0`
+
+---
+
+## 4. Résolution des problèmes courants
+
+### Erreur lors du script `./setup.sh`
+
+Si le script échoue au moment de la configuration de la base de données, augmentez le temps d'attente (`sleep`) dans le fichier `setup.sh` pour laisser plus de temps à MySQL pour s'initialiser.
+
+### Erreur d'image (Build)
+
+Si une image ne se charge pas correctement, forcez la reconstruction sans cache :
+
 ```bash
 podman compose build --no-cache web
-```
-
-### après modifications du code dans contener/data/CI4/app :
-
-```bash
-./script/push.sh
-```
-
-
-## Pour lancer le projet :
-1. Si ce n'est pas fait copier coller le fichier `env` et le renommer `.env` dans data/CI4 et décommentez les lignes comme suivant (si cela n'est pas fait) : 
 
 ```
-#--------------------------------------------------------------------
-# DATABASE
-#--------------------------------------------------------------------
 
-database.default.hostname = mysql
-database.default.database = tp
-database.default.username = user
-database.default.password = pass
-database.default.DBDriver = MySQLi
-database.default.DBPrefix =
-database.default.port = 3306
-```
+### Problème de permissions ou dossier `writable`
 
-Dans eq_1_04_bracq-noe_devillers-tino_dufresne-elric_martin-sacha\contener\data\mescripts\
-J'ai modifié les scripts pour ne pas avoir à faire pleins de commandes dans le terminal CI4/
-Pour l'instant ça focntionne sur mon Windows mais je n'ai pas encore éssayé sous Linux.
-2. Lancer le script create.sh
-3. Lancer le script push.sh
-4. Lancer le script terminal.sh
-5. Une fois dans le terminal aller dans le dossier `CI4`
-6. Taper la commande `php spark migrate`
-7. Taper la commande `php spark db:seed DatabaseSeeder`
-
-
-
-Si ça ne fonctionne pas, il faut suivre ces étapes et taper ces commandes à la main : 
-2. Lancer le script create.sh
-3. Lancer le script push.sh
-4. Lancer le script terminal.sh
-5. Une fois dans le terminal aller dans le dossier `CI4`
-6. Taper la commande `composer install`
-(on utilise pas shield mais un auth maison)
-7. Taper la commande `php spark migrate`
-8. Taper la commande `php spark db:seed DatabaseSeeder`
-
-## 🛠️ Problème courant : dossier `writable` ou permissions
-
-Si `php spark migrate` échoue, c’est souvent parce que les dossiers nécessaires n’existent pas.
-
-Créer manuellement **les dossiers requis** writable/uploads/masters et public/uploads/preview avec les bonnes permissions:
+Si les migrations échouent ou si l'application ne peut pas écrire de fichiers, vous pouvez recréer les dossiers et réinitialiser les permissions manuellement dans le conteneur :
 
 ```bash
 mkdir -p writable/{cache,logs,session,uploads}
@@ -77,85 +75,38 @@ mkdir -p public/uploads/previews
 
 chown -R www-data:www-data writable public/uploads
 chmod -R 775 writable public/uploads
+
 ```
 
+### Dossier `vendor` dans Git
 
-Ce dépôt contient l'application **CodeIgniter 4 (CI4)** et l'environnement de conteneurisation basé sur **Podman** pour le développement.
-
-L'environnement comprend trois services :
-
-1.  **php** (`web`): PHP 8.4 + Apache (avec Composer, CI4 extensions, etc.).
-2.  **mysql8** (`mysql`): Base de données MySQL 8.0.
-3.  **phpmyadmin**: Interface de gestion pour MySQL.
-
------
-
-
-### 🚨 Important
-
-  * **Toutes les modifications du code CI4** doivent se faire dans les dossiers du conteneur `/var/www/html/CI4/`.
-  * Il faut push au début et pull à la fin d'une session de travail.
-  * Le dossier `data/CI4/` correspond à `/var/www/html/CI4/` à l'intérieur du conteneur.
-
------
-
-## 2\. ⚙️ Prérequis et Configuration Initiale (🚨Windows)
-
-1.  **Installation de Podman :** Installez **Podman Desktop** sur Windows (ou Podman CLI sur Linux).
-2.  **Machine Podman :** Démarrez la machine virtuelle Podman (une seule fois par session) :
-    ```bash
-    podman machine start
-    ```
-3.  **Outil Compose :** Assurez-vous que l'outil Compose (`podman compose`) est installé (souvent via Podman Desktop ou `pip` sur Linux).
-
------
-
-## 3\. 🛠️ Lancement et Workflow (Windows/Git Bash & Fedora/Linux)
-
-### A. Démarrage de l'Environnement
-
-Placez-vous à la racine du dossier d'environnement (là où se trouve `compose.yaml` et le dossier `scripts/`).
+Assurez-vous que le dossier `vendor` n'est pas suivi par Git. Si c'est le cas, utilisez la commande suivante pour le retirer du cache sans supprimer les fichiers locaux :
 
 ```bash
-cd contener
+git rm -r --cached data/CI4/vendor
 
-# Lancer la construction et le démarrage des conteneurs
-./scripts/create.sh
 ```
 
-### B. Accès aux Services
+### Pour Lancer le projet manuellement
 
-| Service | Accès | Description |
-| :--- | :--- | :--- |
-| **CodeIgniter 4** | `http://localhost:8081` | Le Virtual Host CodeIgniter. |
-| **phpMyAdmin** | `http://localhost:8082` | Gestion de la base de données. |
-
-### C. Workflow de Développement (Synchronisation du Code)
-
-Après avoir modifié vos fichiers **localement**, vous devez les transférer au conteneur.
-
-  * **Transférer le code** vers le conteneur et mettre à jour les permissions :
-    ```bash
-    ./scripts/push.sh
-    ```
-  * **Récupérer le code**  :
-    ```bash
-    ./scripts/pull.sh
-    ```
-
-### D. Accès au Terminal du Conteneur
-
-Le script a été modifié pour fonctionner sous Git Bash (`MSYS_NO_PATHCONV=1`).
+placez vous a la racine du projet
 
 ```bash
-# Ouvre un terminal dans le conteneur 'php'
-./scripts/terminal.sh
+cd conteneur
+./script/create.sh
+./script/push.sh
+./script/terminal.sh
 ```
 
-
-
-### E. Arrêt de l'Environnement
-
+dans le conteneur
 ```bash
-./scripts/down.sh
+cd CI4
+composer install
+mkdir -p writable/cache writable/debugbar writable/logs writable/session writable/uploads
+chmod -R 777 writable
+mkdir -p public/images/avatars
+chmod -R 777 public/images/avatars
+mv env .env
+php spark migrate
+php spark db:seed DatabaseSeeder
 ```

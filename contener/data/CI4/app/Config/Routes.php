@@ -31,7 +31,18 @@ $routes->get('/', 'HomeController::index');
 */
 $routes->get('/mentions-legales', 'LegalController::mentions');
 $routes->get('/confidentialite', 'LegalController::privacy');
+$routes->get('/politique-confidentialite', 'LegalController::privacy'); // alias
 $routes->get('/cgv', 'LegalController::cgv');
+$routes->get('/contact', function() {
+    return view('legal/contact', ['title' => 'Contact']);
+});
+$routes->get('/a-propos', function() {
+    return view('legal/about', ['title' => 'À propos']);
+});
+$routes->get('/about', function() {
+    return view('legal/about', ['title' => 'À propos']);
+}); // alias EN
+
 /*
 |--------------------------------------------------------------------------
 | Auth

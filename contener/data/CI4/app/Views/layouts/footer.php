@@ -43,9 +43,9 @@
             <h4>Informations</h4>
             <ul>
                 <li><a href="<?= site_url('/conditions-utilisation') ?>">Conditions d'utilisation</a></li>
-                <li><a href="#">Politique de confidentialité</a></li>
-                <li><a href="#">Contact</a></li>
-                <li><a href="#">À propos</a></li>
+                <li><a href="<?= site_url('/confidentialite') ?>">Politique de confidentialité</a></li>
+                <li><a href="<?= site_url('/contact') ?>">Contact</a></li>
+                <li><a href="<?= site_url('/a-propos') ?>">À propos</a></li>
             </ul>
         </div>
     </div>

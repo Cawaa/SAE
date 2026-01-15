@@ -48,14 +48,6 @@ $avatarUrl = static function (?string $avatarRel): string {
                 <span>✅ <?= count($soldBeats) ?> beats vendus</span>
             </div>
         </div>
-
-        <?php if (session()->get('user_id') && (int)session()->get('user_id') !== (int)$artist['id']) : ?>
-            <div>
-                <a href="<?= site_url('/conversations/with/' . (int)$artist['id']) ?>" class="btn-action btn-contact" style="display: inline-block; padding: 12px 24px; background: var(--primary-blue); color: white; border-radius: 6px; text-decoration: none; font-weight: 600;">
-                    💬 Contacter
-                </a>
-            </div>
-        <?php endif; ?>
     </div>
 
     <!-- Beats disponibles -->

@@ -1,0 +1,102 @@
+/* Container spécifique au formulaire */
+.beat-form-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fdfdfd;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+}
+
+/* Titres */
+.beat-form-container h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.beat-form-container h3 {
+    margin-top: 25px;
+    color: #2c3e50;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 10px;
+}
+
+/* Champs de saisie et labels */
+.beat-form-container label {
+    font-weight: bold;
+    color: #555;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.beat-form-container input[type="text"],
+.beat-form-container input[type="number"],
+.beat-form-container select,
+.beat-form-container textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.beat-form-container textarea {
+    resize: vertical;
+}
+
+/* Section Fichiers Audio */
+.beat-form-container input[type="file"] {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px dashed #2563eb;
+    width: 100%;
+    border-radius: 5px;
+}
+
+.beat-form-container small {
+    color: #666;
+    font-style: italic;
+    display: block;
+    margin-bottom: 15px;
+}
+
+/* Bouton Soumettre */
+.beat-form-container button[type="submit"] {
+    background-color: #2563eb;
+    color: white;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.beat-form-container button[type="submit"]:hover {
+    background-color: #2563eb;
+}
+
+/* Alertes Flash */
+.beat-form-container p strong {
+    display: block;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Erreurs de session */
+.beat-form-container p:has(strong):first-of-type {
+    background-color: #ffcccc;
+    color: #cc0000;
+}

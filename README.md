@@ -1,7 +1,9 @@
 # Projet Tempo - Guide de lancement
+Ce projet a été réalisé par Noé BRACQ, Elric DUFRESNE, Tino DEVILLERS et Sacha MARTIN dans le cadre de notre SAE3.1 du BUT Informatique à l'IUT de Nantes.
 
 Ce dépôt contient notre application **CodeIgniter 4** et son environnement de conteneurisation basé sur **Podman**.
 
+Tempo est une plateforme de mise en relation directe entre créateurs et acheteurs (C2C). Ce site permettra aux beatmakers de mettre en vente leurs compositions musicales et aux clients de les acquérir pour leurs propres projets.
 ## 1. Prérequis
 
 Avant de commencer, assurez-vous d'avoir installé les outils suivants :

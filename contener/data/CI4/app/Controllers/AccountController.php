@@ -140,9 +140,6 @@ class AccountController extends BaseController
             $newName = $file->getRandomName();
             $file->move($avatarDir, $newName, true);
 
-            // Suppression de l'ancien avatar s'il existait
-            $file->move($avatarDir, $newName, true);
-
             // Supprimer l'ancien avatar si c'est un fichier uploadé (avatars/*)
             $old = (string)($user['avatar'] ?? '');
             if ($old !== '' && str_starts_with($old, 'avatars/')) {

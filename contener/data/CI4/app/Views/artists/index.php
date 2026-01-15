@@ -18,6 +18,14 @@ $avatarUrl = static function (?string $avatarRel): string {
     $avatarRel = str_replace(['..', '\\'], ['', '/'], $avatarRel);
     $avatarRel = ltrim($avatarRel, '/');
 
+  // 
+  if (str_starts_with($avatarRel, 'images/')) {
+    return base_url($avatarRel);
+  }
+  if (str_starts_with($avatarRel, 'avatars/')) {
+    return base_url('images/' . $avatarRel);
+  }
+
     return base_url('images/avatars/' . $avatarRel);
 };
 ?>

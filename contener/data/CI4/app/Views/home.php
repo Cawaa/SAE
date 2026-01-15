@@ -24,21 +24,21 @@
         <div class="artist-grid">
             <div class="artist-card">
                 <div class="img-container">
-                    <img src="<?= base_url('./images/seraph1m.png') ?>" alt="S3R4PH1M">
+                    <img src="<?= base_url('./images/avatars/prod1.jpg') ?>" alt="S3R4PH1M">
                 </div>
-                <h3>S3R4PH1M</h3>
+                <h3>beatmaker1</h3>
             </div>
             <div class="artist-card">
                 <div class="img-container">
-                    <img src="<?= base_url('./images/vlad.png') ?>" alt="Vladimir cauchemar">
+                    <img src="<?= base_url('./images/avatars/prod2.jpg') ?>" alt="Vladimir cauchemar">
                 </div>
-                <h3>Vladimir cauchemar</h3>
+                <h3>beatmaker2</h3>
             </div>
             <div class="artist-card">
                 <div class="img-container">
-                    <img src="<?= base_url('./images/perceval.png') ?>" alt="Perceval">
+                    <img src="<?= base_url('./images/avatars/prod3.jpg') ?>" alt="Perceval">
                 </div>
-                <h3>Perceval</h3>
+                <h3>beatmaker3</h3>
             </div>
         </div>
     </section>

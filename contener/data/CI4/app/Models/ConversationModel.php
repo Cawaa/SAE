@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les conversations entre utilisateurs.
 class ConversationModel extends Model
 {
     protected $table      = 'conversations';
@@ -13,6 +14,7 @@ class ConversationModel extends Model
     protected $allowedFields = ['beat_id','buyer_id','seller_id','created_at'];
     protected $useTimestamps = false;
 
+    // Vérifie si un utilisateur est participant d'une conversation donnée.
     public function isParticipant(int $conversationId, int $userId): bool
     {
         return $this->where('id', $conversationId)
@@ -23,6 +25,7 @@ class ConversationModel extends Model
             ->countAllResults() > 0;
     }
 
+    // Récupère ou crée une conversation entre un acheteur et un vendeur pour un beat donné.
     public function getOrCreate(int $beatId, int $buyerId, int $sellerId): int
     {
         $existing = $this->where([

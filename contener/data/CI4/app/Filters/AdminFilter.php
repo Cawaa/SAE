@@ -6,6 +6,7 @@ use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 
+// Filtre pour restreindre l'accès aux administrateurs.
 class AdminFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)

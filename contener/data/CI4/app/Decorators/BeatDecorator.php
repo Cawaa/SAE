@@ -2,6 +2,7 @@
 
 namespace App\Decorators;
 
+// Classe abstraite pour les décorateurs de beats.
 abstract class BeatDecorator implements BeatInterface {
     protected BeatInterface $beat;
 

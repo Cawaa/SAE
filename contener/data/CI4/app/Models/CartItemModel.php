@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les éléments du panier.
 class CartItemModel extends Model
 {
     protected $table      = 'cart_items';
@@ -13,6 +14,7 @@ class CartItemModel extends Model
     protected $allowedFields = ['cart_id', 'beat_id', 'quantite', 'created_at'];
     protected $useTimestamps = false;
 
+    // Récupère les éléments détaillés du panier avec les informations des beats.
     public function getDetailedItems(int $cartId): array
     {
         return $this->db->table('cart_items ci')
@@ -24,6 +26,7 @@ class CartItemModel extends Model
             ->getResultArray();
     }
 
+    // Supprime les éléments du panier dont les beats ne sont plus disponibles (vendus ou inactifs).
     public function removeSoldItems(int $cartId): int
     {
         $rows = $this->db->table('cart_items ci')

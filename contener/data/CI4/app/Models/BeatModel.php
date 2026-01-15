@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les beats.
 class BeatModel extends Model
 {
     protected $table      = 'beats';
@@ -19,6 +20,7 @@ class BeatModel extends Model
 
     protected $useTimestamps = false;
 
+    // Récupère un beat actif non vendu par son ID.
     public function findActiveById(int $id): ?array
     {
         return $this->where('id', $id)
@@ -27,6 +29,8 @@ class BeatModel extends Model
             ->first();
     }
 
+
+    // Marque un beat comme vendu.
     public function markAsSold(int $beatId, int $buyerId): bool
     {
         $builder = $this->db->table($this->table);

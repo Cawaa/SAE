@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour récupérer les artistes en vedette.
 class ArtistSpotlightModel extends Model
 {
     protected $db;
@@ -41,6 +42,7 @@ class ArtistSpotlightModel extends Model
             ->get()->getResultArray();
     }
 
+    // Récupère les beats vendus pour une liste d'utilisateurs, limité par utilisateur.
     public function getSoldBeatsForUsers(array $userIds, int $perUser = 6): array
     {
         if (empty($userIds)) return [];
@@ -56,6 +58,7 @@ class ArtistSpotlightModel extends Model
         return $this->groupLimitPerUser($rows, $perUser);
     }
 
+    // Récupère les beats disponibles pour une liste d'utilisateurs, limité par utilisateur.
     public function getAvailableBeatsForUsers(array $userIds, int $perUser = 6): array
     {
         if (empty($userIds)) return [];
@@ -72,9 +75,11 @@ class ArtistSpotlightModel extends Model
         return $this->groupLimitPerUser($rows, $perUser);
     }
 
+    // Limite le nombre de beats par utilisateur dans le résultat.
     private function groupLimitPerUser(array $rows, int $perUser): array
     {
         $grouped = [];
+        // Parcourt les lignes et groupe les beats par user en limitant le nombre par utilisateur.
         foreach ($rows as $r) {
             $uid = (int)$r['user_id'];
             $grouped[$uid] ??= [];

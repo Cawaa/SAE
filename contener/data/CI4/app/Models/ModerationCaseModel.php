@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les cas de modération.
 class ModerationCaseModel extends Model
 {
     protected $table      = 'moderation_cases';

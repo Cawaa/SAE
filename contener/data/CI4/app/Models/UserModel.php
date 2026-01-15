@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les utilisateurs.
 class UserModel extends Model
 {
     protected $table      = 'users';

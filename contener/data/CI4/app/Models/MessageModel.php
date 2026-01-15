@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les messages dans les conversations.
 class MessageModel extends Model
 {
     protected $table      = 'messages';

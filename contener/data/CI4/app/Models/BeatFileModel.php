@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les fichiers associés aux beats.
 class BeatFileModel extends Model
 {
     protected $table      = 'beat_files';
@@ -23,6 +24,7 @@ class BeatFileModel extends Model
 
     protected $useTimestamps = false;
 
+    // Récupère le chemin du fichier pour un beat et un type donnés.
     public function getPathByType(int $beatId, string $type): ?string
     {
         $row = $this->where('beat_id', $beatId)
@@ -50,6 +52,7 @@ class BeatFileModel extends Model
         return $this->getPathByType($beatId, 'master_wav');
     }
 
+    // Insère ou met à jour un fichier de beat.
     public function upsertFile(
         int $beatId,
         string $type,

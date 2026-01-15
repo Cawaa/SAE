@@ -4,6 +4,7 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+// Modèle pour gérer les paniers.
 class CartModel extends Model
 {
     protected $table      = 'carts';

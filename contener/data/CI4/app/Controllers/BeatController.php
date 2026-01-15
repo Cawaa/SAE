@@ -528,7 +528,16 @@ class BeatController extends BaseController
         }
 
         if (!@mkdir($path, 0775, true) && !is_dir($path)) {
-            throw new \RuntimeException("Impossible de créer le dossier: {$path}");
+            // Message d'erreur plus détaillé
+            $parentDir = dirname($path);
+            $parentPerms = is_dir($parentDir) ? decoct(fileperms($parentDir) & 0777) : 'N/A';
+            $parentOwner = is_dir($parentDir) ? posix_getpwuid(fileowner($parentDir))['name'] : 'N/A';
+            
+            throw new \RuntimeException(
+                "Impossible de créer le dossier: {$path}\n" .
+                "Parent: {$parentDir} (permissions: {$parentPerms}, owner: {$parentOwner})\n" .
+                "Solution: exécutez 'chmod -R 777 public/uploads' dans le conteneur"
+            );
         }
     }
 

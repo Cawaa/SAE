@@ -71,13 +71,33 @@ podman compose build --no-cache web
 Si les migrations échouent ou si l'application ne peut pas écrire de fichiers, vous pouvez recréer les dossiers et réinitialiser les permissions manuellement dans le conteneur :
 
 ```bash
-mkdir -p writable/{cache,logs,session,uploads}
+podman exec -it php bash
+cd CI4
+
+# Créer tous les dossiers nécessaires
+mkdir -p writable/{cache,logs,session,uploads,debugbar}
 mkdir -p writable/uploads/masters
 mkdir -p public/uploads/previews
+mkdir -p public/images/avatars
 
-chown -R www-data:www-data writable public/uploads
-chmod -R 775 writable public/uploads
+# Définir les permissions
+chown -R www-data:www-data writable public/uploads public/images
+chmod -R 775 writable public/uploads public/images
+```
 
+### Erreur "Impossible de créer le dossier" lors de l'upload
+
+Si vous obtenez cette erreur lors de la publication d'un beat :
+
+1. **Vérifiez les permissions** :
+```bash
+podman exec php ls -la CI4/public/uploads/
+```
+
+2. **Corrigez les permissions** :
+```bash
+podman exec php chown -R www-data:www-data CI4/public/uploads
+podman exec php chmod -R 775 CI4/public/uploads
 ```
 
 ### Dossier `vendor` dans Git

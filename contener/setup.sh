@@ -24,7 +24,11 @@ podman exec php /bin/bash -c "
     cd CI4 && \
     composer install && \
     mkdir -p writable/cache writable/debugbar writable/logs writable/session writable/uploads && \
+    mkdir -p writable/uploads/masters && \
+    mkdir -p public/uploads/previews && \
     chmod -R 777 writable && \
+    chmod -R 777 public/uploads && \
+    chown -R www-data:www-data writable public/uploads && \
     mkdir -p public/images/avatars && \
     chmod -R 777 public/images/avatars && \
     if [ -f env ]; then mv env .env; fi && \

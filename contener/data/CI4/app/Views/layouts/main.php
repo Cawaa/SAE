@@ -23,6 +23,7 @@ if ($session->get('isLoggedIn')) {
     <meta charset="UTF-8">
     <title>TEMPO - <?= $title ?? 'Accueil' ?></title>
     <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('css/footer.css') ?>">
     <?= $this->renderSection('extra-css') ?>
 </head>
 <body>
@@ -51,5 +52,7 @@ if ($session->get('isLoggedIn')) {
     <div class="container">
         <?= $this->renderSection('content') ?>
     </div>
+
+    <?= $this->include('layouts/footer') ?>
 </body>
 </html>

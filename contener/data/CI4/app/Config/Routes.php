@@ -171,3 +171,9 @@ $routes->group('admin', ['filter' => 'adminAuth'], static function ($routes) {
     $routes->post('users/delete/(:num)', 'AdminController::deleteUser/$1');
     $routes->post('beats/delete/(:num)', 'AdminController::deleteBeat/$1');
 });
+
+
+// Dans la section Public ou Legal
+$routes->get('/conditions-utilisation', function() {
+    return view('legal/conditions'); // Ou pointez vers un contrôleur dédié
+});

@@ -42,7 +42,7 @@
         <div class="footer-section footer-legal">
             <h4>Informations</h4>
             <ul>
-                <li><a href="#">Conditions d'utilisation</a></li>
+                <li><a href="<?= site_url('/conditions-utilisation') ?>">Conditions d'utilisation</a></li>
                 <li><a href="#">Politique de confidentialité</a></li>
                 <li><a href="#">Contact</a></li>
                 <li><a href="#">À propos</a></li>

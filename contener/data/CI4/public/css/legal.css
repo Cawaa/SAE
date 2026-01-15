@@ -1,0 +1,55 @@
+/* Style pour les pages légales (CGU, Confidentialité) */
+.legal-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    line-height: 1.6;
+    color: #333;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.legal-container h1 {
+    color: #0056b3; /* Bleu Tempo */
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.legal-section {
+    margin-bottom: 25px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid #0056b3;
+}
+
+.legal-section h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    font-size: 1.4rem;
+}
+
+.legal-section p, .legal-section ul {
+    margin-bottom: 10px;
+}
+
+.legal-section ul {
+    padding-left: 20px;
+}
+
+.legal-section li {
+    margin-bottom: 5px;
+}
+
+.highlight {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+@media (max-width: 600px) {
+    .legal-container {
+        padding: 15px;
+        margin: 20px auto;
+    }
+}
